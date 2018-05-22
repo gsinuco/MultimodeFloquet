@@ -214,7 +214,7 @@ SUBROUTINE FLOQUETINIT(atomicspecie,manifold,JTOTAL,ID,info)
   USE ATOMIC_PROPERTIES  ! gF, F , etc. factors for several species
   USE subinterface       ! To ubroutines for representation of I and J operators
   USE ARRAYS
-  USE FLOQUET            ! Number of floquet modes
+  !USE FLOQUET            ! Number of floquet modes
   USE SUBINTERFACE_LAPACK
   USE TYPES
   IMPLICIT NONE
@@ -516,108 +516,108 @@ SUBROUTINE SETHAMILTONIANCOMPONENTS(ID,NM,NF,MODES_NUM,FIELD,INFO)
   
 END SUBROUTINE SETHAMILTONIANCOMPONENTS
 
-SUBROUTINE SINGLEMODEFLOQUETMATRIX(ATOM_,FIELD,INFO)
-
-! SET UP THE HAMILTONIAN MATRIX PERFROMING A TRANSFORMATION TO A DOUBLE
-! ROTATING FRAME
-! ATOM_, IN, ATOM-TYPE, PARAMETERS OF AN ATOM
-! FIELD, IN, FIELD-TYPE, FIELD PARAMETERS
-! INFO, INOUT, INTEGER, ERROR FLAG
-
-
-  USE FLOQUET
-  USE ARRAYS
-  USE ATOMIC_PROPERTIES
-  USE TYPES
-  USE SUBINTERFACE_LAPACK
-
-  IMPLICIT NONE
-  INTEGER,                        INTENT(INOUT) :: INFO
-  TYPE(MODE),DIMENSION(MODES_NUM),INTENT(IN)    :: FIELD
-  TYPE(ATOM),                     INTENT(IN)    :: ATOM_
-
-  INTEGER m,n,D,r,o
-  COMPLEX*16,       DIMENSION(:,:), ALLOCATABLE :: H_TEMP,H_STATIC,COUPLING,Z_M_COPY
-  DOUBLE PRECISION, DIMENSION(:),   ALLOCATABLE :: E_DRESSED
-  INTEGER index_l_lower,index_l_upper,index_r_lower,index_r_upper
-
-
-  D        = ATOM_%D_BARE
-  ALLOCATE(H_FLOQUET_COPY(D,D))
-
-  !write(*,*) D
-  H_FLOQUET_COPY = FIELD(1)%V  ! STATIC HAMILTONIAN
-
-  !DEALLOCATE(COUPLING)
-  DO n=2,MODES_NUM_DRESSING!2,2!MODES_NUM  ! RUN OVER EACH MODE
-
-     ! D : UPDATED AT THE ENDO OF THE LOOP. DIMENSION OF THE MULTIMODE FLOQUET MATRIX
-
-     H_STATIC  = H_FLOQUET_COPY
-     DEALLOCATE(H_FLOQUET_COPY)
-
-     ALLOCATE(IDENTITY(D,D))
-     IDENTITY  = 0.0
-     DO m= 1,D
-        IDENTITY(m,m) = 1.0
-     END DO
-
-     !     WRITE(*,*) n,"COUPLIGN ALLOCATE",D
-     ALLOCATE(COUPLING(D,D))
-     COUPLING  = 0.0
-
-     DO r=1,(2*N_FLOQUET_DRESSING(n-1)+1)
-
-        index_l_lower = ATOM_%D_BARE*(r - 1) + 1
-        index_l_upper = ATOM_%D_BARE*(r - 1) + ATOM_%D_BARE
-        index_r_lower = index_l_lower
-        index_r_upper = index_l_upper
-        COUPLING(index_l_lower:index_l_upper, index_r_lower:index_r_upper) = &
-             &     FIELD(n)%V  ! COUPLING MATRIX OF MODE n
-        !        write(*,*) n,r,index_l_lower,index_l_upper
-     END DO
-
-     D = D*(2*N_FLOQUET_DRESSING(n)+1)
-     ALLOCATE(H_FLOQUET(D,D))
-     H_FLOQUET = 0.0
-
-
-     !    WRITE(*,*) SIZE(COUPLING,1),D
-     DO m=-N_FLOQUET_DRESSING(n),N_FLOQUET_DRESSING(n)
-
-        index_l_lower = (m + N_FLOQUET_DRESSING(n)    )*SIZE(COUPLING,1) + 1
-        index_l_upper = index_l_lower + SIZE(COUPLING,1) - 1
-        index_r_lower =  index_l_lower
-        index_r_upper =  index_l_upper
-        H_FLOQUET(index_l_lower:index_l_upper, index_r_lower:index_r_upper) = &
-             &  1.0*H_STATIC + 1.0*m*hbar*FIELD(n)%OMEGA*IDENTITY/A
-        !        Observable_extended(index_l_lower:index_l_upper, index_r_lower:index_r_upper) = &
-        !             &  Observable
-
-        IF(m.LT.N_FLOQUET_DRESSING(n)) THEN
-
-           index_l_lower =  (m + N_Floquet_DRESSING(n) + 1)*SIZE(COUPLING,1) + 1
-           index_l_upper =  index_l_lower + SIZE(COUPLING,1) - 1
-           index_r_lower =  (m + N_Floquet_DRESSING(n)    )*SIZE(COUPLING,1) + 1
-           index_r_upper =  index_r_lower + SIZE(COUPLING,1) - 1
-           H_FLOQUET(index_l_lower:index_l_upper, index_r_lower:index_r_upper) = &
-                &     0.5*COUPLING
-           !           write(*,*) index_l_lower,index_l_upper,index_r_lower,index_r_upper
-
-           index_l_lower =  (m + N_Floquet_DRESSING(n)    )*SIZE(COUPLING,1) + 1
-           index_l_upper =  index_r_lower + SIZE(COUPLING,1)  - 1
-           index_r_lower =  (m + N_Floquet_DRESSING(n) + 1)*SIZE(COUPLING,1) + 1
-           index_r_upper =  index_l_lower + SIZE(COUPLING,1)  - 1
-           H_FLOQUET(index_l_lower:index_l_upper, index_r_lower:index_r_upper) = &
-                &     0.5*TRANSPOSE(CONJG(COUPLING))
-        END IF
-
-     END DO
-
-     DEALLOCATE(IDENTITY)
-     DEALLOCATE(COUPLING)
-
-  END DO
-
-END SUBROUTINE SINGLEMODEFLOQUETMATRIX
-
+!!$SUBROUTINE SINGLEMODEFLOQUETMATRIX(ATOM_,FIELD,INFO)
+!!$
+!!$! SET UP THE HAMILTONIAN MATRIX PERFROMING A TRANSFORMATION TO A DOUBLE
+!!$! ROTATING FRAME
+!!$! ATOM_, IN, ATOM-TYPE, PARAMETERS OF AN ATOM
+!!$! FIELD, IN, FIELD-TYPE, FIELD PARAMETERS
+!!$! INFO, INOUT, INTEGER, ERROR FLAG
+!!$
+!!$
+!!$  USE FLOQUET
+!!$  USE ARRAYS
+!!$  USE ATOMIC_PROPERTIES
+!!$  USE TYPES
+!!$  USE SUBINTERFACE_LAPACK
+!!$
+!!$  IMPLICIT NONE
+!!$  INTEGER,                        INTENT(INOUT) :: INFO
+!!$  TYPE(MODE),DIMENSION(MODES_NUM),INTENT(IN)    :: FIELD
+!!$  TYPE(ATOM),                     INTENT(IN)    :: ATOM_
+!!$
+!!$  INTEGER m,n,D,r,o
+!!$  COMPLEX*16,       DIMENSION(:,:), ALLOCATABLE :: H_TEMP,H_STATIC,COUPLING,Z_M_COPY
+!!$  DOUBLE PRECISION, DIMENSION(:),   ALLOCATABLE :: E_DRESSED
+!!$  INTEGER index_l_lower,index_l_upper,index_r_lower,index_r_upper
+!!$
+!!$
+!!$  D        = ATOM_%D_BARE
+!!$  ALLOCATE(H_FLOQUET_COPY(D,D))
+!!$
+!!$  !write(*,*) D
+!!$  H_FLOQUET_COPY = FIELD(1)%V  ! STATIC HAMILTONIAN
+!!$
+!!$  !DEALLOCATE(COUPLING)
+!!$  DO n=2,MODES_NUM_DRESSING!2,2!MODES_NUM  ! RUN OVER EACH MODE
+!!$
+!!$     ! D : UPDATED AT THE ENDO OF THE LOOP. DIMENSION OF THE MULTIMODE FLOQUET MATRIX
+!!$
+!!$     H_STATIC  = H_FLOQUET_COPY
+!!$     DEALLOCATE(H_FLOQUET_COPY)
+!!$
+!!$     ALLOCATE(IDENTITY(D,D))
+!!$     IDENTITY  = 0.0
+!!$     DO m= 1,D
+!!$        IDENTITY(m,m) = 1.0
+!!$     END DO
+!!$
+!!$     !     WRITE(*,*) n,"COUPLIGN ALLOCATE",D
+!!$     ALLOCATE(COUPLING(D,D))
+!!$     COUPLING  = 0.0
+!!$
+!!$     DO r=1,(2*N_FLOQUET_DRESSING(n-1)+1)
+!!$
+!!$        index_l_lower = ATOM_%D_BARE*(r - 1) + 1
+!!$        index_l_upper = ATOM_%D_BARE*(r - 1) + ATOM_%D_BARE
+!!$        index_r_lower = index_l_lower
+!!$        index_r_upper = index_l_upper
+!!$        COUPLING(index_l_lower:index_l_upper, index_r_lower:index_r_upper) = &
+!!$             &     FIELD(n)%V  ! COUPLING MATRIX OF MODE n
+!!$        !        write(*,*) n,r,index_l_lower,index_l_upper
+!!$     END DO
+!!$
+!!$     D = D*(2*N_FLOQUET_DRESSING(n)+1)
+!!$     ALLOCATE(H_FLOQUET(D,D))
+!!$     H_FLOQUET = 0.0
+!!$
+!!$
+!!$     !    WRITE(*,*) SIZE(COUPLING,1),D
+!!$     DO m=-N_FLOQUET_DRESSING(n),N_FLOQUET_DRESSING(n)
+!!$
+!!$        index_l_lower = (m + N_FLOQUET_DRESSING(n)    )*SIZE(COUPLING,1) + 1
+!!$        index_l_upper = index_l_lower + SIZE(COUPLING,1) - 1
+!!$        index_r_lower =  index_l_lower
+!!$        index_r_upper =  index_l_upper
+!!$        H_FLOQUET(index_l_lower:index_l_upper, index_r_lower:index_r_upper) = &
+!!$             &  1.0*H_STATIC + 1.0*m*hbar*FIELD(n)%OMEGA*IDENTITY/A
+!!$        !        Observable_extended(index_l_lower:index_l_upper, index_r_lower:index_r_upper) = &
+!!$        !             &  Observable
+!!$
+!!$        IF(m.LT.N_FLOQUET_DRESSING(n)) THEN
+!!$
+!!$           index_l_lower =  (m + N_Floquet_DRESSING(n) + 1)*SIZE(COUPLING,1) + 1
+!!$           index_l_upper =  index_l_lower + SIZE(COUPLING,1) - 1
+!!$           index_r_lower =  (m + N_Floquet_DRESSING(n)    )*SIZE(COUPLING,1) + 1
+!!$           index_r_upper =  index_r_lower + SIZE(COUPLING,1) - 1
+!!$           H_FLOQUET(index_l_lower:index_l_upper, index_r_lower:index_r_upper) = &
+!!$                &     0.5*COUPLING
+!!$           !           write(*,*) index_l_lower,index_l_upper,index_r_lower,index_r_upper
+!!$
+!!$           index_l_lower =  (m + N_Floquet_DRESSING(n)    )*SIZE(COUPLING,1) + 1
+!!$           index_l_upper =  index_r_lower + SIZE(COUPLING,1)  - 1
+!!$           index_r_lower =  (m + N_Floquet_DRESSING(n) + 1)*SIZE(COUPLING,1) + 1
+!!$           index_r_upper =  index_l_lower + SIZE(COUPLING,1)  - 1
+!!$           H_FLOQUET(index_l_lower:index_l_upper, index_r_lower:index_r_upper) = &
+!!$                &     0.5*TRANSPOSE(CONJG(COUPLING))
+!!$        END IF
+!!$
+!!$     END DO
+!!$
+!!$     DEALLOCATE(IDENTITY)
+!!$     DEALLOCATE(COUPLING)
+!!$
+!!$  END DO
+!!$
+!!$END SUBROUTINE SINGLEMODEFLOQUETMATRIX
+!!$

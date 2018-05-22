@@ -19,7 +19,7 @@ CONTAINS
     IF(M.NE.N) DELTA_KR_INT = 0    
   END FUNCTION delta_kr_int
 
-  END MODULE funciones
+END MODULE funciones
 
 
 
