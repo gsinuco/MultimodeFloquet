@@ -188,7 +188,7 @@ SUBROUTINE MULTIMODETRANSITIONAVG(D,U_F_MODES,E_MULTIFLOQUET,D_BARE,U,INFO)
   U_AUX  =  U_MODES_n(index0)%U
   U = 0.0
   DO index1=1,MULTIMODE_HARMONICS
-     U = U +  MATMUL(abs(U_AUX)**2,ABS(TRANSPOSE(CONJG(U_MODES_n(index1)%U)))**2)
+     U = U +  MATMUL(ABS(U_AUX)**2,ABS(TRANSPOSE(CONJG(U_MODES_n(index1)%U)))**2)
   END DO
 
   info = 0
@@ -673,7 +673,7 @@ SUBROUTINE MULTIMODETIMEEVOLUTINOPERATOR_RESTRICTED(D,NF,U_F_MODES,E_MULTIFLOQUE
   Fup                   = 2
   Fdown                 = 1
   hbar                  = 1.054E-34 
-  A                     = 2.0*4.0*atan(1.0)*hbar*3.417341E9
+  A                     = 2.0*4.0*ATAN(1.0)*hbar*3.417341E9
 
   DO i=1,NF
      OMEGA_VEC(i) = FIELD(i)%OMEGA
@@ -778,3 +778,378 @@ END SUBROUTINE MULTIMODETIMEEVOLUTINOPERATOR_RESTRICTED
 
 
 
+
+!!$SUBROUTINE COORDINATEPACKING(D,A,V,R,C,index,INFO)
+!!$  IMPLICIT NONE
+!!$  INTEGER,INTENT(IN):: D
+!!$  COMPLEX*16,DIMENSION(D,D),INTENT(IN)  :: A
+!!$  COMPLEX*16,DIMENSION(D*D),INTENT(OUT) :: V
+!!$  INTEGER, DIMENSION(D*D),  INTENT(OUT) :: R,C
+!!$  INTEGER, INTENT(OUT)   :: index
+!!$  INTEGER, INTENT(INOUT) :: INFO
+!!$  
+!!$  INTEGER I,J
+!!$  V=0
+!!$  R=0
+!!$  C=0
+!!$  
+!!$  index = 1
+!!$  DO I=1,D
+!!$     DO J=1,D
+!!$        IF(ABS(A(I,J)).GT.0) THEN
+!!$           V(index) = A(I,J)
+!!$           R(index) = I
+!!$           C(index) = J
+!!$           index = index+1
+!!$        END IF
+!!$     END DO
+!!$  END DO
+!!$  index = index-1
+!!$END SUBROUTINE COORDINATEPACKING
+!!$
+!!$MODULE MERGINGARRAYS
+!!$  INTERFACE
+!!$     SUBROUTINE APPENDARRAYS(V,B,INFO)
+!!$       COMPLEX*16, DIMENSION(:),ALLOCATABLE, INTENT(INOUT) :: V
+!!$       COMPLEX*16, DIMENSION(:),INTENT(IN)    :: B
+!!$       INTEGER,                 INTENT(INOUT) :: INFO
+!!$     END SUBROUTINE APPENDARRAYS
+!!$     SUBROUTINE APPENDARRAYSI(V,B,INFO)
+!!$       INTEGER, DIMENSION(:),ALLOCATABLE, INTENT(INOUT) :: V
+!!$       INTEGER, DIMENSION(:),INTENT(IN)    :: B
+!!$       INTEGER,                 INTENT(INOUT) :: INFO
+!!$     END SUBROUTINE APPENDARRAYSI
+!!$  END INTERFACE
+!!$END MODULE MERGINGARRAYS
+!!$
+!!$SUBROUTINE APPENDARRAYS(V,B,INFO)
+!!$  COMPLEX*16, DIMENSION(:),ALLOCATABLE, INTENT(INOUT) :: V
+!!$  COMPLEX*16, DIMENSION(:),INTENT(IN)    :: B
+!!$  INTEGER,                 INTENT(INOUT) :: INFO
+!!$  
+!!$  COMPLEX*16,DIMENSION(:),ALLOCATABLE :: tmp_arr
+!!$!  write(*,*) V
+!!$!  write(*,*) B
+!!$  ALLOCATE(tmp_arr(SIZE(V,1)+SIZE(B,1)))
+!!$  tmp_arr(1:SIZE(V,1))=V
+!!$  tmp_arr(SIZE(V,1)+1:SIZE(tmp_arr))=B
+!!$  DEALLOCATE(V)
+!!$  ALLOCATE(V(SIZE(tmp_arr)))
+!!$  V=tmp_arr
+!!$END SUBROUTINE APPENDARRAYS
+!!$
+!!$SUBROUTINE APPENDARRAYSI(V,B,INFO)
+!!$  INTEGER, DIMENSION(:),ALLOCATABLE, INTENT(INOUT) :: V
+!!$  INTEGER, DIMENSION(:),INTENT(IN)    :: B
+!!$  INTEGER,                 INTENT(INOUT) :: INFO
+!!$  
+!!$  COMPLEX*16,DIMENSION(:),ALLOCATABLE :: tmp_arr
+!!$  
+!!$  ALLOCATE(tmp_arr(SIZE(V,1)+SIZE(B,1)))
+!!$  tmp_arr(1:SIZE(V,1))=V
+!!$  tmp_arr(SIZE(V,1)+1:SIZE(tmp_arr))=B
+!!$  DEALLOCATE(V)
+!!$  ALLOCATE(V(SIZE(tmp_arr)))
+!!$  V=tmp_arr
+!!$END SUBROUTINE APPENDARRAYSI
+
+!!$SUBROUTINE MULTIMODEFLOQUETMATRIX_SP(ATOM_,NM,NF,MODES_NUM,FIELDS,VALUES_,ROW_INDEX_,COLUMN_,INFO)
+!!$  
+!!$  USE TYPES !(modes.f90)
+!!$  USE MERGINGARRAYS !(utils.f90)
+!!$  
+!!$  IMPLICIT NONE
+!!$  INTEGER                  ,INTENT(IN)    :: NM,NF
+!!$  TYPE(MODE), DIMENSION(NF),INTENT(INOUT) :: FIELDs
+!!$  TYPE(ATOM),               INTENT(IN)    :: ATOM_
+!!$  INTEGER, DIMENSION(NM),   INTENT(IN)    :: MODES_NUM
+!!$  INTEGER,                  INTENT(INOUT) :: INFO
+!!$  COMPLEX*16, DIMENSION(:), ALLOCATABLE,INTENT(OUT) :: VALUES_
+!!$  INTEGER,    DIMENSION(:), ALLOCATABLE,INTENT(OUT) :: COLUMN_
+!!$  INTEGER,    DIMENSION(:), ALLOCATABLE,INTENT(OUT) :: ROW_INDEX_
+!!$  
+!!$  
+!!$  COMPLEX*16, DIMENSION(:,:), ALLOCATABLE :: V_AUX
+!!$  COMPLEX*16, DIMENSION(:),   ALLOCATABLE :: VALUES,ARRAY_AUX,VALUES_OLD,VALUES_OLD_
+!!$  INTEGER,    DIMENSION(:),   ALLOCATABLE ::ROW,COLUMN,ARRAYI_AUX,ROW_OLD,COLUMN_OLD,ROW_INDEX,INDEX_ORDERROW
+!!$  INTEGER,    DIMENSION(NF)               :: N_FLOQUET
+!!$  
+!!$  INTEGER :: D_MULTIFLOQUET
+!!$  INTEGER m,r,c,index,D,counter, N_MODES,values_dim,D_bare,t
+!!$  CHARACTER*1 UPLO
+!!$  
+!!$  !PARAMETERS REQUIRED TO TEST THE DIAGONALIZATION ROUTINE
+!  COMPLEX*16,      DIMENSION(:,:),ALLOCATABLE :: U_F
+!  DOUBLE PRECISION,DIMENSION(:),ALLOCATABLE :: E_FLOQUET
+!  DOUBLE PRECISION :: E_L,E_R
+!!$
+!!$  N_MODES = NF
+!!$  D_bare = ATOM_%D_BARE
+!!$  info   = 0
+!!$
+!!$  ALLOCATE(VALUES(D_bare*D_bare))
+!!$  ALLOCATE(ROW(D_bare*D_bare))
+!!$  ALLOCATE(COLUMN(D_bare*D_bare))
+!!$
+!!$  !DEFINITION OF THE MATRICES: BY HAND  
+!!$  DO r=1,NF
+!!$     N_FLOQUET(r) = FIELDS(r)%N_FLOQUET
+!!$  END DO
+!!$    
+!!$  ! COORDINATE PACKING OF EACH FIELD
+!!$  
+!!$  D_MULTIFLOQUET = SIZE(FIELDS(1)%V,1)
+!!$  DO m=1,NF
+!!$     CALL COORDINATEPACKING(D_bare,FIELDS(m)%V,VALUES,ROW,COLUMN,index,INFO)
+!!$     ALLOCATE(FIELDS(m)%VALUES(index))
+!!$     IF(m.eq.1) FIELDS(m)%VALUES = VALUES(1:index)
+!!$     IF(m.ne.1) FIELDS(m)%VALUES = VALUES(1:index)/2.0
+!!$!     write(*,*) real(fields(m)%values)
+!!$!     write(*,*) fields(m)%omega
+!!$     ALLOCATE(FIELDS(m)%ROW(index))
+!!$     FIELDS(m)%ROW = ROW(1:index)
+!!$!     WRITE(*,*) FIELDS(m)%ROW
+!!$     ALLOCATE(FIELDS(m)%COLUMN(index))
+!!$     FIELDS(m)%COLUMN = COLUMN(1:index)
+!!$!     WRITE(*,*) FIELDS(m)%COLUMN
+!!$     D_MULTIFLOQUET = D_MULTIFLOQUET*(2*N_FLOQUET(m)+1)
+!!$!     write(*,*) d_multifloquet
+!!$  END DO
+!!$!  WRITE(*,*)
+!!$
+!!$  ! WE HAVE TO REDEFINE VALUES,ROW,COLUMN FOR m > 2 as follows:
+!!$  D = D_bare
+!!$  index = 1
+!!$  DO m=3,NF
+!!$     DEALLOCATE(VALUES)
+!!$     DEALLOCATE(ROW)
+!!$     DEALLOCATE(COLUMN)
+!!$     ALLOCATE(VALUES(SIZE(FIELDS(m)%VALUES,1)))
+!!$     ALLOCATE(ROW(SIZE(FIELDS(m)%VALUES,1)))
+!!$     ALLOCATE(COLUMN(SIZE(FIELDS(m)%VALUES,1)))
+!!$     ALLOCATE(ARRAYI_AUX(SIZE(FIELDS(m)%VALUES,1)))
+!!$     VALUES = FIELDS(m)%VALUES
+!!$     ROW    = FIELDS(m)%ROW
+!!$     COLUMN = FIELDS(m)%COLUMN
+!!$     DO r=2,2*N_FLOQUET(m-1)+1
+!!$        CALL APPENDARRAYS(VALUES,FIELDS(m)%VALUES,INFO)
+!!$        ARRAYI_AUX = FIELDS(m)%ROW + (r-1)*D
+!!$        CALL APPENDARRAYSI(ROW,ARRAYI_AUX,INFO)
+!!$        ARRAYI_AUX =  FIELDS(m)%COLUMN + (r-1)*D
+!!$        CALL APPENDARRAYSI(COLUMN,ARRAYI_AUX,INFO)
+!!$     END DO
+!!$     DEALLOCATE(FIELDS(m)%VALUES)
+!!$     DEALLOCATE(FIELDS(m)%ROW)
+!!$     DEALLOCATE(FIELDS(m)%COLUMN)
+!!$     DEALLOCATE(ARRAYI_AUX)
+!!$     ALLOCATE(FIELDS(m)%VALUES(SIZE(VALUES,1)))
+!!$     ALLOCATE(FIELDS(m)%ROW(SIZE(VALUES,1)))
+!!$     ALLOCATE(FIELDS(m)%COLUMN(SIZE(VALUES,1)))
+!!$     FIELDS(m)%VALUES = VALUES
+!!$     FIELDS(m)%ROW    = ROW
+!!$     FIELDS(m)%COLUMN = COLUMN
+!!$!     write(*,*) D
+!!$!     write(*,*) abs(values)
+!!$!     write(*,*) row
+!!$!     write(*,*) column
+!!$     D = D*(2*N_FLOQUET(m-1)+1)     
+!!$  END DO
+!!$  DEALLOCATE(VALUES)
+!!$  DEALLOCATE(ROW)
+!!$  DEALLOCATE(COLUMN)
+!!$  
+!!$  
+!!$  ! BUILDING THE COORDINATE PACKING OF THE MULTIMODE HAMILTONIAN MATRIX
+!!$  D = D_bare
+!!$  values_dim = 0  
+!!$  ALLOCATE(VALUES_OLD(SIZE(FIELDS(1)%VALUES,1)))
+!!$  ALLOCATE(ROW_OLD(SIZE(FIELDS(1)%VALUES,1)))
+!!$  ALLOCATE(COLUMN_OLD(SIZE(FIELDS(1)%VALUES,1)))
+!!$  ALLOCATE(VALUES(SIZE(FIELDS(1)%VALUES)))
+!!$  ALLOCATE(ROW(SIZE(FIELDS(1)%VALUES)))
+!!$  ALLOCATE(COLUMN(SIZE(FIELDS(1)%VALUES)))
+!!$  VALUES = FIELDS(1)%VALUES
+!!$  ROW    = FIELDS(1)%ROW
+!!$  COLUMN = FIELDS(1)%COLUMN
+!!$  VALUES_OLD = FIELDS(1)%VALUES
+!!$  ROW_OLD    = FIELDS(1)%ROW
+!!$  COLUMN_OLD = FIELDS(1)%COLUMN  
+!!$!  write(*,*)values_old
+!!$  DO m=2,NF
+!!$     ALLOCATE(ARRAYI_AUX(SIZE(FIELDS(m)%ROW,1)))
+!!$     ALLOCATE(VALUES_OLD_(SIZE(VALUES_OLD,1)))
+!!$     VALUES_OLD_ = VALUES_OLD
+!!$     DO r=1,2*N_FLOQUET(m) + 1
+!!$        DO c = 1,2*N_FLOQUET(m) + 1
+!!$           index = c-r
+!!$           
+!!$           IF(index.EQ.0) THEN
+!!$              
+!!$              DO t=1,SIZE(VALUES_OLD,1)
+!!$                 IF(COLUMN_OLD(t).EQ.ROW_OLD(t)) VALUES_OLD_(t) = VALUES_OLD(t) + 1.0*(-N_FLOQUET(m)+c-1)*FIELDS(m)%OMEGA
+!!$              END DO
+!!$              IF(c.NE.1) THEN
+!!$                 CALL APPENDARRAYS(VALUES,VALUES_OLD_,INFO)
+!!$                 CALL APPENDARRAYSI(COLUMN,COLUMN_OLD+(c-1)*D,INFO)
+!!$                 CALL APPENDARRAYSI(ROW,ROW_OLD+(c-1)*D,INFO)
+!!$              ELSE
+!!$                 VALUES = VALUES_OLD_
+!!$              END IF
+!!$           ELSE IF(ABS(index).EQ.1) THEN            
+!!$              CALL APPENDARRAYS(VALUES,FIELDS(m)%VALUES,INFO)
+!!$              ARRAYI_AUX =  FIELDS(m)%COLUMN + (c-1)*D
+!!$              CALL APPENDARRAYSI(COLUMN,ARRAYI_AUX,INFO)
+!!$              
+!!$              ARRAYI_AUX =  FIELDS(m)%ROW + (r-1)*D
+!!$              CALL APPENDARRAYSI(ROW,ARRAYI_AUX,INFO)
+!!$           END IF
+!!$        END DO
+!!$     END DO
+!!$     
+!!$     D = D*(2*N_FLOQUET(m)+1)
+!!$     DEALLOCATE(VALUES_OLD_)
+!!$     DEALLOCATE(VALUES_OLD)
+!!$     DEALLOCATE(ROW_OLD)
+!!$     DEALLOCATE(COLUMN_OLD)
+!!$     DEALLOCATE(ARRAYI_AUX)
+!!$     
+!!$     ALLOCATE(VALUES_OLD(SIZE(VALUES,1)))
+!!$     ALLOCATE(ROW_OLD(SIZE(VALUES,1)))
+!!$     ALLOCATE(COLUMN_OLD(SIZE(VALUES,1)))
+!!$     VALUES_OLD = VALUES
+!!$     ROW_OLD    = ROW
+!!$     COLUMN_OLD = COLUMN
+!!$  END DO
+!!$  
+!!$  DEALLOCATE(VALUES_OLD)
+!!$  DEALLOCATE(ROW_OLD)
+!!$  DEALLOCATE(COLUMN_OLD)
+!!$  
+!!$  ! BUILDING THE VARIATION CRS PACKING OF THE MULTIMODE HAMILTONIAN MATRIX, USING THE COORDINATE PACKING
+!!$
+!!$  !  DO r=1,size(VALUES,1)
+!!$  !     WRITE(*,*) ROW(r),COLUMN(r),REAL(VALUES(r))
+!!$  !  END DO
+!!$  !    WRITE(*,*) SIZE(VALUES,1)
+!!$  !    WRITE(*,*) REAL(VALUES)
+!!$  !    WRITE(*,*) ROW
+!!$  !    WRITE(*,*) COLUMN
+!!$  !WRITE(*,*) 
+!!$  ALLOCATE(INDEX_ORDERROW(SIZE(ROW,1)))
+!!$  CALL QUICK_SORT_INTEGERS(ROW,INDEX_ORDERROW,SIZE(ROW,1))
+!!$  ROW    = ROW(INDEX_ORDERROW)
+!!$  COLUMN = COLUMN(INDEX_ORDERROW)
+!!$  VALUES = VALUES(INDEX_ORDERROW)
+!!$  
+!!$  ! write(*,*) row
+!!$  ! WRITE(*,*)
+!!$  ! write(*,*) column
+!!$  ! WRITE(*,*)
+!!$  ! WRITE(*,*) D_MULTIFLOQUET
+!!$  
+!!$  
+!!$  ALLOCATE(ROW_INDEX(D_MULTIFLOQUET+1))
+!!$  ROW_INDEX = -1
+!!$  ROW_INDEX(D_MULTIFLOQUET+1) = SIZE(VALUES,1)+1
+!!$  
+!!$  counter = 1
+!!$  
+!!$  D = 1
+!!$  ROW_INDEX(1)=1
+!!$  DO r = 2,SIZE(ROW,1)
+!!$     IF(ROW(r).EQ.ROW(r-1)) THEN
+!!$        counter = counter +1        
+!!$     ELSE
+!!$        D = D + counter
+!!$        ROW_INDEX(ROW(r)) =D
+!!$        counter = 1
+!!$     END IF
+!!$  END DO
+!!$  !  WRITE(*,*) D_MULTIFLOQUET,nf
+!  E_L = -6.0
+!  E_R =  6.0
+!  ALLOCATE(E_FLOQUET(D_MULTIFLOQUET))
+!  ALLOCATE(U_F(D_MULTIFLOQUET,D_MULTIFLOQUET))
+!  CALL MKLSPARSE_FULLEIGENVALUES(D_MULTIFLOQUET,SIZE(VALUES,1),VALUES,ROW_INDEX,COLUMN,E_L,E_R,E_FLOQUET,U_F,INFO)
+!  write(*,*) E_FLOQUET
+!!$  ALLOCATE(VALUES_(SIZE(VALUES,1)))
+!!$  ALLOCATE(ROW_INDEX_(SIZE(ROW_INDEX,1)))
+!!$  ALLOCATE(COLUMN_(SIZE(COLUMN,1)))
+!!$  
+!!$  VALUES_    = VALUES
+!!$  ROW_INDEX_ = ROW_INDEX
+!!$  COLUMN_    = COLUMN
+!!$  
+!!$  DEALLOCATE(VALUES)
+!!$  DEALLOCATE(ROW)
+!!$  DEALLOCATE(COLUMN)
+!!$  DEALLOCATE(ROW_INDEX)
+!!$
+!!$END SUBROUTINE MULTIMODEFLOQUETMATRIX_SP ! _SP  sparse packing
+
+!!$SUBROUTINE MKLSPARSE_FULLEIGENVALUES(D,DV,VALUES,ROW_INDEX,COLUMN,E_L,E_R,E_FLOQUET,U_F,INFO)
+!!$
+!!$!CALCULATES THE ENERGY SPECTRUM OF THE MATRIX REPRESENTED BY VALUES, ROW_INDEX AND COLUMN
+!!$! D (IN), MATRIX DIMENSION == NUMBER OF EIGENVALUES
+!!$! DV (IN), NUMBER OF VALUES != 0
+!!$! VALUES (IN) ARRAY OF VALUES
+!!$! ROW_INDEX (IN), ARRAY OF INDICES
+!!$! COLUMN (IN),    ARRAY OF COLUMN NUMBERS
+!!$! E_L (IN),       LEFT BOUNDARY OF THE SEARCH INTERVAL
+!!$! E_R (IN),       RIGHT BOUNDARY OF THE SEARCH INTERVAL
+!!$! E_FLOQUET (OUT), ARRAY OF EIGENVALUES
+!!$! INFO     (INOUT)  ERROR FLAG
+!!$
+!!$  USE FEAST
+!!$  IMPLICIT NONE
+!!$  INTEGER,                          INTENT(IN)    :: D,DV
+!!$  COMPLEX*16,       DIMENSION(DV),  INTENT(INOUT) :: VALUES
+!!$  INTEGER,          DIMENSION(DV),  INTENT(INOUT) :: COLUMN
+!!$  INTEGER,          DIMENSION(D+1), INTENT(INOUT) :: ROW_INDEX
+!!$  DOUBLE PRECISION,                 INTENT(IN)    :: E_L,E_R
+!!$  DOUBLE PRECISION, DIMENSION(D),   INTENT(OUT)   :: E_FLOQUET
+!!$  COMPLEX*16,       DIMENSION(D,D), INTENT(OUT)   :: U_F
+!!$  INTEGER,                          INTENT(INOUT) :: INFO
+!!$
+!!$  CHARACTER*1 UPLO
+!!$!  DOUBLE PRECISION :: Emin,Emax
+!!$  
+!!$
+!!$  ! ----- 2. RUN FEASTINIT
+!!$  
+!!$  CALL feastinit(fpm)
+!!$  
+!!$  ! ----- 3. SOLVE THE STANDARD EIGENVALUE PROBLEM
+!!$
+!!$  M0  = D  ! number of eignevalues requested
+!!$  
+!!$  ALLOCATE(E(M0)) ! array of eigenvalues
+!!$  ALLOCATE(RES(M0)) ! array of residuals
+!!$  ALLOCATE(X(D,M0)) ! matrix with eigenvectors
+!!$  E   = 0
+!!$  RES = 0
+!!$  X   = 0
+!!$
+!!$
+!!$  info_FEAST = 0
+!!$  Emin = E_L!-15.0 ! SEARCH INTERVAL: LOWER BOUND
+!!$  Emax = E_R! 15.0 ! SEARCH INTERVAL: UPPER BOUND
+!!$  UPLO = 'F'
+!!$!  WRITE(*,*) d,SIZE(VALUES,1),SIZE(ROW_INDEX,1),SIZE(COLUMN,1),SIZE(FPM,1)
+!!$  CALL zfeast_hcsrev(UPLO,D,VALUES,ROW_INDEX,COLUMN,fpm,epsout,loop, &
+!!$       &   Emin,Emax,M0,E,X,M1,res,info_FEAST)
+!!$  !PRINT  *,'FEAST OUTPUT INFO ',info
+!!$  !WRITE(*,*) 'GUESSED NUMBER OF EIGENVALUES:', m0
+!!$  !WRITE(*,*) 'NUMBER OF EIGENVALUES FOUND:', m1
+!!$  !WRITE(*,*) 'EIGENVALUES:', E, D
+!!$  !WRITE(*,*) 'EIGENVECTORS:', ABS(X)
+!!$  !CALL WRITE_MATRIX(D_MULTIFLOQUET,D_MULTIFLOQUET,ABS(X))
+!!$  E_FLOQUET = E
+!!$  U_F       = X
+!!$
+!!$  DEALLOCATE(RES)
+!!$  DEALLOCATE(X)
+!!$  DEALLOCATE(E)
+!!$  
+!!$END SUBROUTINE MKLSPARSE_FULLEIGENVALUES
+!!$

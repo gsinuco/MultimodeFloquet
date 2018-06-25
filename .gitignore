@@ -1,4 +1,8 @@
+#*#
 *.f90~
 *.dat
+*.dat~
+*.data
+*.datt
 *.txt~
 *.txt
