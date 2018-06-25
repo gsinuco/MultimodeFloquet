@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="100">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df root="." name="0">
+      <df name="examples">
+        <df name="FORTRAN">
+          <in>main_qubit_SP.f90</in>
+        </df>
+      </df>
+      <df name="src">
+        <in>F_representation.f90</in>
+        <in>Floquet_init.f90</in>
+        <in>I_and_J_representations.f90</in>
+        <in>LapackEigenValues.f90</in>
+        <in>MKLSparseEigenvalues.f90</in>
+        <in>Modules.f90</in>
+        <in>Modules_release.f90</in>
+        <in>MultimodeFloquetTE.f90</in>
+        <in>MultimodeHamiltonian.f90</in>
+        <in>MultimodeHamiltonian_SP.f90</in>
+        <in>VarCRSPacking.f90</in>
+        <in>delta_kr.f90</in>
+        <in>main_qubit.f90</in>
+        <in>main_qubit_SP.f90</in>
+        <in>modes.f90</in>
+        <in>quick-sort-index-table.f90</in>
+        <in>sparse_utils.f90</in>
+        <in>util.f90</in>
+      </df>
+    </df>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>/home/german/Dropbox/Programs/MultimodeFloquet/release/Makefile</itemPath>
+      <itemPath>nbproject/private/launcher.properties</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceFolderFilter>^(nbproject)$</sourceFolderFilter>
+  <sourceRootList>
+    <Elem>.</Elem>
+  </sourceRootList>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>false</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <codeAssistance>
+      </codeAssistance>
+      <makefileType>
+        <makeTool>
+          <buildCommandWorkingDir>/home/german/Dropbox/Programs/MultimodeFloquet/release</buildCommandWorkingDir>
+          <buildCommand>${MAKE} -f Makefile</buildCommand>
+          <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
+          <executablePath>./build/MultimodeFloquetQubit_SP</executablePath>
+        </makeTool>
+        <preBuild>
+          <preBuildCommandWorkingDir>.</preBuildCommandWorkingDir>
+          <preBuildCommand></preBuildCommand>
+        </preBuild>
+      </makefileType>
+      <item path="examples/FORTRAN/main_qubit_SP.f90" ex="false" tool="2" flavor2="0">
+      </item>
+      <item path="src/F_representation.f90" ex="false" tool="2" flavor2="0">
+      </item>
+      <item path="src/Floquet_init.f90" ex="false" tool="2" flavor2="0">
+      </item>
+      <item path="src/I_and_J_representations.f90" ex="false" tool="2" flavor2="0">
+      </item>
+      <item path="src/LapackEigenValues.f90" ex="false" tool="2" flavor2="0">
+      </item>
+      <item path="src/MKLSparseEigenvalues.f90" ex="false" tool="2" flavor2="0">
+      </item>
+      <item path="src/Modules.f90" ex="false" tool="2" flavor2="0">
+      </item>
+      <item path="src/Modules_release.f90" ex="false" tool="2" flavor2="0">
+      </item>
+      <item path="src/MultimodeFloquetTE.f90" ex="false" tool="2" flavor2="0">
+      </item>
+      <item path="src/MultimodeHamiltonian.f90" ex="false" tool="2" flavor2="0">
+      </item>
+      <item path="src/MultimodeHamiltonian_SP.f90" ex="false" tool="2" flavor2="0">
+      </item>
+      <item path="src/VarCRSPacking.f90" ex="false" tool="2" flavor2="0">
+      </item>
+      <item path="src/delta_kr.f90" ex="false" tool="2" flavor2="0">
+      </item>
+      <item path="src/main_qubit.f90" ex="false" tool="2" flavor2="0">
+      </item>
+      <item path="src/main_qubit_SP.f90" ex="false" tool="2" flavor2="7">
+      </item>
+      <item path="src/modes.f90" ex="false" tool="2" flavor2="0">
+      </item>
+      <item path="src/quick-sort-index-table.f90" ex="false" tool="2" flavor2="0">
+      </item>
+      <item path="src/sparse_utils.f90" ex="false" tool="2" flavor2="0">
+      </item>
+      <item path="src/util.f90" ex="false" tool="2" flavor2="0">
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>
