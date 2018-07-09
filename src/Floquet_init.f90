@@ -54,7 +54,7 @@ SUBROUTINE SET_ATOMIC_PARAMETERS(ATOMICSPECIE,MANIFOLD,JTOTAL,ID,INFO)
      Fup     = Fup_qubit
      Fdown   = Fdown_qubit
      INFO    = 2 ! ITS A QUBIT
-     write(*,*) "#qubit"
+     write(*,*) "#qubit setting up"
   CASE("spin")
      mass_at = amu
      I       = I_spin
@@ -215,7 +215,7 @@ SUBROUTINE FLOQUETINIT(atomicspecie,manifold,JTOTAL,ID,info)
   USE subinterface       ! To ubroutines for representation of I and J operators
   USE ARRAYS
   !USE FLOQUET            ! Number of floquet modes
-  USE SUBINTERFACE_LAPACK
+  !USE SUBINTERFACE_LAPACK
   USE TYPES
   IMPLICIT NONE
 
@@ -229,9 +229,7 @@ SUBROUTINE FLOQUETINIT(atomicspecie,manifold,JTOTAL,ID,info)
   INTEGER  r,D_F2,P,r_,p_
   DOUBLE PRECISION, DIMENSION(:),ALLOCATABLE:: Energy
 
-  !write(*,*) atomicspecie,manifold
   CALL SET_ATOMIC_PARAMETERS(ATOMICSPECIE,MANIFOLD,JTOTAL,ID,INFO)
-!  write(*,*) atomicspecie,manifold,ID%id_system,total_states_lsi
 
    !------ ALLOCATE NEEDED ARRAYS: Hamiltonian and Lapack
   ALLOCATE(Energy(TOTAL_STATES_LSI))
@@ -442,24 +440,24 @@ SUBROUTINE SETHAMILTONIANCOMPONENTS(ID,NM,NF,MODES_NUM,FIELD,INFO)
   USE ARRAYS
   USE ATOMIC_PROPERTIES
   USE TYPES
-  USE SUBINTERFACE_LAPACK
+  !USE SUBINTERFACE_LAPACK
 
   IMPLICIT NONE
-  INTEGER, INTENT(IN) ::NM,NF
-  TYPE(ATOM),               INTENT(IN)    :: ID
+  INTEGER,                   INTENT(IN)    :: NM,NF
+  TYPE(ATOM),                INTENT(IN)    :: ID
   INTEGER,    DIMENSION(NM), INTENT(IN)    :: MODES_NUM
   TYPE(MODE), DIMENSION(NF), INTENT(INOUT) :: FIELD
-  INTEGER,                  INTENT(INOUT) :: INFO
+  INTEGER,                   INTENT(INOUT) :: INFO
 
   INTEGER m,TOTAL_FREQUENCIES,N_FLOQUET_
-  DOUBLE PRECISION, DIMENSION(:),ALLOCATABLE :: E_ZEEMAN,mFs
+  DOUBLE PRECISION, DIMENSION(:),ALLOCATABLE :: mFs
+  DOUBLE PRECISION, DIMENSION(id%d_bare) :: E_ZEEMAN
   DOUBLE PRECISION :: RESONANTrfFREQUENCY
 
-  TOTAL_FREQUENCIES = NF!SUM(MODES_NUM,1)
-!  write(*,*) total_frequencies,NM
+  TOTAL_FREQUENCIES = NF
   SELECT CASE(ID%id_system)
   CASE(3) ! ATOM, BOTH HYPERFINE MANIFOLDS
-     ALLOCATE(E_ZEEMAN(ID%D_BARE))
+!     ALLOCATE(E_ZEEMAN(ID%D_BARE))
      U_ZEEMAN = 0.0
      DO m=1,TOTAL_FREQUENCIES
         IF(m.EQ.1) THEN
@@ -487,16 +485,19 @@ SUBROUTINE SETHAMILTONIANCOMPONENTS(ID,NM,NF,MODES_NUM,FIELD,INFO)
      KD = KD + SIZE(U_ZEEMAN,1) - 1
 
      
-     DEALLOCATE(E_ZEEMAN)
+  !   DEALLOCATE(E_ZEEMAN)
   CASE DEFAULT ! ATOM, ON MANIFOLD, QUBIT, SPIN
-     ALLOCATE(E_ZEEMAN(ID%D_BARE))
+!!$     !    ALLOCATE(E_ZEEMAN(ID%D_BARE))
+     !write(*,*)id%d_bare
      U_ZEEMAN = 0.0
      DO m=1,TOTAL_FREQUENCIES
-!        write(*,*) m,total_frequencies
+        !write(*,*) m,total_frequencies
         IF(m.EQ.1) THEN
            FIELD(m)%V = (FIELD(m)%X*J_x  + DCMPLX(0.0,-1.0)*FIELD(m)%Y*J_y + FIELD(m)%Z*J_z) 
            U_ZEEMAN   = FIELD(m)%V 
+           !write(*,*) size(u_zeeman,1),size(e_zeeman,1), SIZE(FIELD(m)%V,1)
            CALL LAPACK_FULLEIGENVALUES(U_ZEEMAN,SIZE(FIELD(m)%V,1),E_ZEEMAN,INFO)
+           !write(*,*) info
         END IF
         
         IF(m.GT.1) THEN
@@ -510,7 +511,7 @@ SUBROUTINE SETHAMILTONIANCOMPONENTS(ID,NM,NF,MODES_NUM,FIELD,INFO)
         KD = KD*(2*N_FLOQUET_+1)
      END DO
      KD = KD + SIZE(U_ZEEMAN,1) - 1
-     DEALLOCATE(E_ZEEMAN)
+     !DEALLOCATE(E_ZEEMAN)
 
   END SELECT
   

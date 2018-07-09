@@ -9,6 +9,20 @@
     </data>
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/home/german/Dropbox/Programs/MultimodeFloquet/release/src/MultimodeFloquetTE.f90</file>
+            <file>file:/home/german/Dropbox/Programs/MultimodeFloquet/release/src/main_qubit_sp.cpp</file>
+            <file>file:/home/german/Dropbox/Programs/MultimodeFloquet/release/Makefile</file>
+            <file>file:/home/german/Dropbox/Programs/MultimodeFloquet/release/src/MultimodeFloquetTE_DRIVER_C.f90</file>
+            <file>file:/home/german/Dropbox/Programs/MultimodeFloquet/release/src/main_qubit_SP.f90</file>
+            <file>file:/home/german/Dropbox/Programs/MultimodeFloquet/release/src/main_DressedQubit_SP.cpp</file>
+            <file>file:/home/german/Dropbox/Programs/MultimodeFloquet/release/src/MultimodeFloquet.h</file>
+            <file>file:/home/german/Dropbox/Programs/MultimodeFloquet/release/src/MultimodeDressedBasis_SP.f90</file>
+            <file>file:/home/german/Dropbox/Programs/MultimodeFloquet/release/src/main_DressedQubit_SP.f90</file>
+            <file>file:/home/german/Dropbox/Programs/MultimodeFloquet/release/src/MultimodeFloquetTE_C.f90</file>
+            <file>file:/home/german/Dropbox/Programs/MultimodeFloquet/release/src/Floquet_init.f90</file>
+            <file>file:/home/german/Dropbox/Programs/MultimodeFloquet/release/src/main_qubit.f90</file>
+            <file>file:/home/german/Dropbox/Programs/MultimodeFloquet/release/src/MultimodeFloquetTE_DRIVER.f90</file>
+        </group>
     </open-files>
 </project-private>

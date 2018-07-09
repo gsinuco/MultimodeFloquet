@@ -24,54 +24,70 @@
       </df>
       <df name="src">
         <in>AlkaliAtoms_parameters.f90</in>
-        <in>ArrayGradientCurvature.f90</in>
-        <in>Bisection.f90</in>
-        <in>ClebshGordan_gsl_fun.c</in>
-        <in>EllipticIntegrals_gsl_fun.c</in>
         <in>EvolutionOperator_RWA.f90</in>
         <in>FFTW_SUBROUTINE.f90</in>
         <in>F_representation.f90</in>
         <in>Floquet.f90</in>
         <in>Floquet_init.f90</in>
+        <in>Floquet_init_C.f90</in>
         <in>IJtoF_TransformationMatrix.f90</in>
         <in>I_and_J_representations.f90</in>
         <in>LapackEigenValues.f90</in>
+        <in>LapackEigenValues_C.f90</in>
         <in>MKLSparseEigenvalues.f90</in>
-        <in>MagneticFieldFunctions.f90</in>
+        <in>MKLSparseEigenvalues_C.f90</in>
         <in>Modules.f90</in>
         <in>Modules_release.f90</in>
+        <in>MultimodeDressedBasis.f90</in>
+        <in>MultimodeDressedBasis_C.f90</in>
+        <in>MultimodeDressedBasis_SP.f90</in>
         <in>MultimodeFloquet.f90</in>
+        <in>MultimodeFloquet.h</in>
         <in>MultimodeFloquetTE.f90</in>
+        <in>MultimodeFloquetTE_C.f90</in>
+        <in>MultimodeFloquetTE_DRIVER.f90</in>
+        <in>MultimodeFloquetTE_DRIVER_C.f90</in>
+        <in>MultimodeFloquet_C.f90</in>
         <in>MultimodeHamiltonian.f90</in>
+        <in>MultimodeHamiltonian_C.f90</in>
         <in>MultimodeHamiltonian_SP.f90</in>
-        <in>PerturbativeShift.f90</in>
-        <in>RF-Landscape.f90</in>
-        <in>Runge-Kutta4thorder.f90</in>
-        <in>StateDependentRingPotential.f90</in>
+        <in>MultimodeHamiltonian_SP_C.f90</in>
+        <in>MultimodeMicroMotion.f90</in>
+        <in>MultimodeMicroMotion_C.f90</in>
+        <in>MultimodeTransitionAVG.f90</in>
+        <in>MultimodeTransitionAVG_C.f90</in>
         <in>VarCRSPacking.f90</in>
         <in>delta_kr.f90</in>
+        <in>main_DressedQubit.cpp</in>
         <in>main_DressedQubit.f90</in>
+        <in>main_DressedQubit_SP.cpp</in>
         <in>main_DressedQubit_SP.f90</in>
         <in>main_Release.f90</in>
+        <in>main_qubit.cpp</in>
         <in>main_qubit.f90</in>
         <in>main_qubit_SP.f90</in>
+        <in>main_qubit_sp.cpp</in>
         <in>modes.f90</in>
+        <in>modes_C.f90</in>
         <in>quick-sort-index-table.f90</in>
         <in>sparse_utils.f90</in>
         <in>util.f90</in>
+        <in>util_c.f90</in>
       </df>
       <in>arrays.mod</in>
       <in>atomic_properties.mod</in>
-      <in>dcrfmwfields.mod</in>
       <in>feast.mod</in>
       <in>floquetinit_.mod</in>
       <in>funciones.mod</in>
       <in>mergingarrays.mod</in>
+      <in>mergingarrays_c.mod</in>
+      <in>modes_4f.mod</in>
       <in>physical_constants.mod</in>
       <in>sparse_interface.mod</in>
       <in>subinterface.mod</in>
       <in>subinterface_lapack.mod</in>
       <in>types.mod</in>
+      <in>types_c.mod</in>
     </df>
   </logicalFolder>
   <projectmakefile>Makefile</projectmakefile>
@@ -99,39 +115,14 @@
         <gdb_interceptlist>
           <gdbinterceptoptions gdb_all="false" gdb_unhandled="true" gdb_unexpected="true"/>
         </gdb_interceptlist>
-        <gdb_signals>
-        </gdb_signals>
         <gdb_options>
           <DebugOptions>
           </DebugOptions>
         </gdb_options>
         <gdb_buildfirst gdb_buildfirst_overriden="false" gdb_buildfirst_old="false"/>
       </dbx_gdbdebugger>
-      <dbxdebugger version="1">
-        <pathmaps>
-        </pathmaps>
-        <interceptlist>
-          <interceptoptions all="false" unhandled="true" unexpected="true"/>
-        </interceptlist>
-        <signals>
-        </signals>
-        <options>
-          <DebugOptions>
-          </DebugOptions>
-        </options>
-        <buildfirst buildfirst_overriden="false" buildfirst_old="false"/>
-      </dbxdebugger>
-      <dbxrtc version="1">
-        <options>
-          <RtcOptions>
-            <option name="rtc_error_log_file_name" value="/dev/null"/>
-          </RtcOptions>
-        </options>
-        <loadobjs>
-        </loadobjs>
-      </dbxrtc>
       <nativedebugger version="1">
-        <engine>dbx</engine>
+        <engine>gdb</engine>
       </nativedebugger>
       <runprofile version="9">
         <runcommandpicklist>
@@ -143,8 +134,6 @@
         <terminal-type>0</terminal-type>
         <remove-instrumentation>0</remove-instrumentation>
         <environment>
-          <variable name="LD_LIBRARY_PATH"
-                    value="/opt/intel/compilers_and_libraries_2017/linux/mkl/lib/intel64"/>
         </environment>
       </runprofile>
     </conf>

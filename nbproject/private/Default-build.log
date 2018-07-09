@@ -1,19 +1,40 @@
-gfortran -c -o build/modes.o src/modes.f90 -O3
-gfortran -c -o build/Modules.o src/Modules.f90 -O3
-gfortran -c -o build/Modules_release.o src/Modules_release.f90 -O3
-gfortran -c -o build/util.o src/util.f90 -O3
-gfortran -c -o build/delta_kr.o src/delta_kr.f90 -O3
-gfortran -c  -o build/I_and_J_representations.o src/I_and_J_representations.f90 -O3
-gfortran -c  -o build/F_representation.o src/F_representation.f90 -O3
-gfortran -c -o build/Floquet.o src/Floquet_init.f90 -O3 
-gfortran -o build/VarCRSPacking.o -c src/VarCRSPacking.f90
-gfortran -o build/quick-sort-index-table.o -c src/quick-sort-index-table.f90 -O3
-gfortran -o build/sparse_utils.o -c src/sparse_utils.f90 -O3
-gfortran -c -o build/LapackEigenValues.o src/LapackEigenValues.f90 -O3
-gfortran -c -o build/MKLSparseEigenValues.o src/MKLSparseEigenvalues.f90 -O3
-gfortran -o build/MultimodeFloquetTE.o -c src/MultimodeFloquetTE.f90 -O3
-gfortran -o build/MultimodeHamiltonian_SP.o -c src/MultimodeHamiltonian_SP.f90 -O3
-gfortran -o build/MultimodeFloquetQubit_SP build/modes.o  build/Modules.o  build/Modules_release.o build/util.o build/delta_kr.o build/I_and_J_representations.o build/F_representation.o build/Floquet.o  build/VarCRSPacking.o build/quick-sort-index-table.o build/sparse_utils.o  build/LapackEigenValues.o  build/MKLSparseEigenValues.o build/MultimodeFloquetTE.o build/MultimodeHamiltonian_SP.o src/main_qubit_SP.f90  -L/opt/intel/compilers_and_libraries/linux/mkl/lib/intel64 -I/opt/intel/compilers_and_libraries/linux/mkl/include	 -m64  -w -fno-second-underscore -x f77-cpp-input  -lpthread -lm -ldl -lgsl -lgslcblas -O3 -llapack -lblas -g -lmkl_gf_lp64 -lmkl_sequential -lmkl_core
-gfortran -o ./examples/FORTRAN/Example_lib_sp  ./examples/FORTRAN/main_qubit_SP.f90 -L./lib/ -lmultimodefloquet -L/opt/intel/compilers_and_libraries/linux/mkl/lib/intel64 -I/opt/intel/compilers_and_libraries/linux/mkl/include	 -m64  -w -fno-second-underscore -x f77-cpp-input  -lpthread -lm -ldl -lgsl -lgslcblas -O3 -llapack -lblas -g -lmkl_gf_lp64 -lmkl_sequential -lmkl_core
-gfortran -o build/MultimodeHamiltonian.o -c src/MultimodeHamiltonian.f90 -O3
-gfortran -o build/MultimodeFloquetQubit_new build/modes.o build/Modules.o  build/Modules_release.o build/util.o build/delta_kr.o build/I_and_J_representations.o build/F_representation.o build/Floquet.o build/VarCRSPacking.o build/quick-sort-index-table.o build/sparse_utils.o  build/LapackEigenValues.o build/MultimodeFloquetTE.o build/MultimodeHamiltonian.o src/main_qubit.f90  -lgsl -lgslcblas -O3 -llapack -lblas -g 
+gfortran -c -o build/modes.o src/modes.f90  
+ERROR: ld.so: object 'libBuildTrace.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
+ERROR: ld.so: object 'libBuildTrace.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
+ERROR: ld.so: object 'libBuildTrace.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
+gfortran -c -o build/modes_C.o build/modes.o src/modes_C.f90  -g
+ERROR: ld.so: object 'libBuildTrace.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
+ERROR: ld.so: object 'libBuildTrace.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
+ERROR: ld.so: object 'libBuildTrace.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
+gfortran: warning: build/modes.o: linker input file unused because linking not done
+gfortran -c -o build/Modules.o src/Modules.f90 -O3 -g
+ERROR: ld.so: object 'libBuildTrace.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
+ERROR: ld.so: object 'libBuildTrace.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
+ERROR: ld.so: object 'libBuildTrace.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
+gfortran -c -o build/Modules_release.o src/Modules_release.f90 -O3 -g
+ERROR: ld.so: object 'libBuildTrace.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
+ERROR: ld.so: object 'libBuildTrace.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
+ERROR: ld.so: object 'libBuildTrace.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
+gfortran -c -o build/util.o src/util.f90 -O3 -g
+ERROR: ld.so: object 'libBuildTrace.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
+ERROR: ld.so: object 'libBuildTrace.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
+ERROR: ld.so: object 'libBuildTrace.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
+gfortran -c -o build/util_c.o build/modes.o build/util.o src/util_c.f90 -g
+ERROR: ld.so: object 'libBuildTrace.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
+ERROR: ld.so: object 'libBuildTrace.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
+src/util_c.f90:123.4:
+
+    CHAR(LEN=*), INTENT(IN) :: OP
+    1
+Error: Unclassifiable statement at (1)
+src/util_c.f90:168.17:
+
+            CASE(default)
+                 1
+Error: Parameter 'default' at (1) has not been declared or is a variable, which does not reduce to a constant expression
+src/util_c.f90:129.21:
+
+        SELECT CASE (OP)
+                     1
+Error: Argument of SELECT statement at (1) cannot be REAL(4)
+make: *** [build/util_c.o] Error 1
