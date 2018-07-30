@@ -37,7 +37,6 @@ Example_lib_f: main_qubit.f90 main_DressedQubit.f90
 	$(GF) -o dressedqubit  main_DressedQubit.f90 -I$(MMFINC) -L$(MMFLIB) -lmultimodefloquet  $(GFFLAGS) 
 	$(GF) -o dressedqubit_DRIVER  main_DressedQubit_DRIVER.f90 -I$(MMFINC) -L$(MMFLIB) -lmultimodefloquet  $(GFFLAGS) 
 	$(GF) -o dressedRb87_DRIVER   main_87Rb_RFMW_DRIVER.f90 -I$(MMFINC) -L$(MMFLIB) -lmultimodefloquet  $(GFFLAGS) 
-	$(GF) -o dressedRb87          main_87Rb_RFMW.f90 -I$(MMFINC) -L$(MMFLIB) -lmultimodefloquet  $(GFFLAGS) 
 
 Example_lib_f_sp: main_qubit_SP.f90 main_DressedQubit_SP.f90
 	$(GF) -o  qubit_sp          main_qubit_SP.f90        -I$(MMFINC) -L$(MMFLIB) -lmultimodefloquet -L$(MKLLIBS) -I$(MKLINC) $(GFFLAGS_SP) $(MKLFLAGS)
@@ -49,4 +48,5 @@ Example_lib_f_sp: main_qubit_SP.f90 main_DressedQubit_SP.f90
 ############################
 
 clean:
-	rm qubit dressedqubit qubit_sp dressedqubit_sp	
+	rm qubit dressedqubit qubit_sp dressedqubit_sp dressedRb87_DRIVER spin_driver dressedqubit_DRIVER qubit_driver
+

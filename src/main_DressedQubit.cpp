@@ -187,7 +187,7 @@ int main(){
             }
         }
         printf("\n\n");
-        multimodemicromotion_c_(&dressingfloquetdimension,&nm_,modes_num_,U_FD,e_dressed,&d_bare,fields_,&t1,U_F1_red,&info); 
+        multimodemicromotion_c_(&id,&dressingfloquetdimension,&nm_,modes_num_,U_FD,e_dressed,&d_bare,fields_,&t1,U_F1_red,&info); 
         for(i=0;i<d_bare;i++){
             for(j=0;j<d_bare;j++){
             printf("%i %f \n",i*d_bare+j,abs(U_F2_red[i*d_bare+j]));

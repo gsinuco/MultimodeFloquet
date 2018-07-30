@@ -135,13 +135,13 @@ set term wxt 12
 unset key
 set xlabel "Frequency"
 set title "Bichromatically driven 87Rb\nBare basis (SP)"
-plot "Rb87_bareoscillation_DRIVER.dat" u 1:7  w lp
+plot "Rb87_bareoscillation_DRIVER.dat" u 1:2  w lp, "" u 1:3 w l lt 3
 
 reset
 set term wxt 13
 unset key
 set title "Bichromatically driven 87Rb\nDressed basis (SP)"
 set xlabel "Frequency"
-plot "Rb87_dressedoscillation_DRIVER.dat" u 1:($6+$7+$8+$9+$10) w lp
+plot "Rb87_dressedoscillation_DRIVER.dat" u 1:2 w lp, "" u 1:3 w l lt 3
 
 

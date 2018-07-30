@@ -7,10 +7,10 @@ AR  = ar
 RANLIB = ranlib
 
 # SET REQUIRED FLAGS
-GFFLAGS    =  -lgsl -lgslcblas -llapack -lblas -g
-GFFLAGS_SP =  -m64  -w -fno-second-underscore -x f77-cpp-input  -lpthread -lm -ldl -lgsl -lgslcblas  -llapack -lblas -g
+GFFLAGS    =  -llapack -lblas -g
+GFFLAGS_SP =  -m64  -w -fno-second-underscore -x f77-cpp-input  -lpthread -lm -ldl  -llapack -lblas -g
 MKLFLAGS   =  -lmkl_gf_lp64 -lmkl_sequential -lmkl_core
-CFLAGS     =  -lgsl -lgslcblas   -static
+CFLAGS     =  -static
 
 #SET MKL-intel LIBRARY PATH
 MKLLIBS = /opt/intel/compilers_and_libraries/linux/mkl/lib/intel64
@@ -24,8 +24,8 @@ MKLINC = /opt/intel/compilers_and_libraries/linux/mkl/include
 all: build/MultimodeFloquetDressedQubit_C build/MultimodeFloquetDressedQubit build/MultimodeFloquetQubit build/MultimodeFloquetQubit_C build/MultimodeFloquetQubit_SP build/MultimodeFloquetQubit_SP_C build/MultimodeFloquetDressedQubit_SP_C build/MultimodeFloquetDressedQubit_SP
 
 all_examples: Example_lib Example_lib_sp Example_lib_c Example_lib_c_sp
-	
-	
+
+
 lib:build/modes.o build/Modules.o build/Modules_release.o build/delta_kr.o build/Floquet.o \
  build/I_and_J_representations.o build/F_representation.o build/LapackEigenValues.o \
  build/MKLSparseEigenValues.o build/util.o build/quick-sort-index-table.o build/VarCRSPacking.o \

@@ -36,7 +36,7 @@ extern "C" {
   // CONTSRUCTION OF THE TIME-EVOLUTION OPERATOR
   void         multimodetransitionavg_c_(int * h_floquet_size,int * nm,mode_c * fields,int * modes_num,dcmplx * U_F,double * e_floquet,int * d_bare,double * p_avg,int *info);
   void multimodefloquettransformation_c_(int * h_floquet_size,int * nm,int * modes_num,dcmplx * U_F,double * e_floquet,int * d_bare,mode_c * fields,double * t1,dcmplx * U_B2D,int * info); 
-  void multimodemicromotion_c_(int * h_floquet_size,int * nm,int * modes_num,dcmplx * U_F,double * e_floquet,int * d_bare,mode_c * fields,double * t1,dcmplx * U_B2D,int * info); 
+  void multimodemicromotion_c_(atom_c *id,int * h_floquet_size,int * nm,int * modes_num,dcmplx * U_F,double * e_floquet,int * d_bare,mode_c * fields,double * t1,dcmplx * U_B2D,int * info); 
   void multimodetimeevolutionoperator_c_(int * h_floquet_size,int * nm,int * modes_num,dcmplx * U_F,double * e_floquet,int * d_bare,mode_c * fields,double * t1,double * t2,dcmplx * U_AUX,int * info);
   
     
