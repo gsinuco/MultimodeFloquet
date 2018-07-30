@@ -14,7 +14,7 @@ SUBROUTINE SET_ATOMIC_PARAMETERS(ATOMICSPECIE,MANIFOLD,JTOTAL,ID,INFO)
   TYPE(ATOM),INTENT(OUT) :: ID
   INTEGER, INTENT(INOUT) :: INFO
     
-  INFO = 0
+  INFO = 4 !UNDEFINED ID
   SELECT CASE (ATOMICSPECIE)
   CASE("87Rb")
      mass_at = 87*amu
@@ -28,7 +28,8 @@ SUBROUTINE SET_ATOMIC_PARAMETERS(ATOMICSPECIE,MANIFOLD,JTOTAL,ID,INFO)
      Fup     = Fup_87Rb
      Fdown   = Fdown_87Rb
      INFO    = 1
-     write(*,*) "#87Rb"
+     ID_name = ID_name_87Rb
+     write(*,*) "# 87Rb"
   CASE ("6Li")
      mass_at = 6*amu
      I       = I_6Li
@@ -41,7 +42,8 @@ SUBROUTINE SET_ATOMIC_PARAMETERS(ATOMICSPECIE,MANIFOLD,JTOTAL,ID,INFO)
      Fup     = Fup_6Li
      Fdown   = Fdown_87Rb     
      INFO    = 1  ! ITS AN ATOM
-     write(*,*) "#6Li"
+     ID_name = ID_name_6Li
+     write(*,*) "# 6Li"
   CASE("qubit")
      mass_at = amu
      I       = I_qubit
@@ -54,7 +56,9 @@ SUBROUTINE SET_ATOMIC_PARAMETERS(ATOMICSPECIE,MANIFOLD,JTOTAL,ID,INFO)
      Fup     = Fup_qubit
      Fdown   = Fdown_qubit
      INFO    = 2 ! ITS A QUBIT
-     write(*,*) "#qubit setting up"
+     ID_name = ID_name_qubit
+     
+     write(*,*) "# qubit"
   CASE("spin")
      mass_at = amu
      I       = I_spin
@@ -67,7 +71,9 @@ SUBROUTINE SET_ATOMIC_PARAMETERS(ATOMICSPECIE,MANIFOLD,JTOTAL,ID,INFO)
      Fup     = Fup_spin
      Fdown   = Fdown_spin
      INFO    = 3 ! ITS A SPIN
-     write(*,*) "#spin"
+     ID_name = ID_name_spin
+
+     write(*,*) "# spin"
 
   END SELECT
   
@@ -140,7 +146,8 @@ SUBROUTINE SET_ATOMIC_PARAMETERS(ATOMICSPECIE,MANIFOLD,JTOTAL,ID,INFO)
      ID%id_system = 5
   ELSE IF(INFO .EQ. 4) THEN
      ! HERE WE DEFINE THE PARAMETES OF THE LATTICE HAMILTONIAN
-     ID%id_system = 6
+     ID%id_system = 6     
+     ID_name = " unnamed"
   END IF
   ID%D_bare = total_states_lsi
   
@@ -215,7 +222,7 @@ SUBROUTINE FLOQUETINIT(atomicspecie,manifold,JTOTAL,ID,info)
   USE subinterface       ! To ubroutines for representation of I and J operators
   USE ARRAYS
   !USE FLOQUET            ! Number of floquet modes
-  !USE SUBINTERFACE_LAPACK
+  USE SUBINTERFACE_LAPACK
   USE TYPES
   IMPLICIT NONE
 
@@ -243,7 +250,10 @@ SUBROUTINE FLOQUETINIT(atomicspecie,manifold,JTOTAL,ID,info)
   ALLOCATE(H_MW(Total_states_LSI,Total_states_LSI))
   ALLOCATE(H_ALPHA(Total_states_LSI,Total_states_LSI))
   ALLOCATE(H_ALPHA_DAGGER(Total_states_LSI,Total_states_LSI))
-  
+!  write(*,*) "Floquet inint says:", total_states_lsi
+  U_zeeman = 0
+!  write(*,*) real(u_zeeman(1,8))
+!  call write_matrix(abs(u_zeeman)) 
   IF(INFO.EQ.1 .AND. MANIFOLD.EQ.'B') THEN
      ALLOCATE(j_x(Total_states_LSI,Total_states_LSI))
      ALLOCATE(j_y(Total_states_LSI,Total_states_LSI))
@@ -440,7 +450,7 @@ SUBROUTINE SETHAMILTONIANCOMPONENTS(ID,NM,NF,MODES_NUM,FIELD,INFO)
   USE ARRAYS
   USE ATOMIC_PROPERTIES
   USE TYPES
-  !USE SUBINTERFACE_LAPACK
+  USE SUBINTERFACE_LAPACK ! write_matrix interface
 
   IMPLICIT NONE
   INTEGER,                   INTENT(IN)    :: NM,NF
@@ -454,26 +464,43 @@ SUBROUTINE SETHAMILTONIANCOMPONENTS(ID,NM,NF,MODES_NUM,FIELD,INFO)
   DOUBLE PRECISION, DIMENSION(id%d_bare) :: E_ZEEMAN
   DOUBLE PRECISION :: RESONANTrfFREQUENCY
 
+  WRITE(*,*) "# Setting the Hamiltonian components for a ",ID_name
+  WRITE(*,*) "# with ",nm, " modes and ",nf," fields"
+  
   TOTAL_FREQUENCIES = NF
   SELECT CASE(ID%id_system)
   CASE(3) ! ATOM, BOTH HYPERFINE MANIFOLDS
-!     ALLOCATE(E_ZEEMAN(ID%D_BARE))
+     !     ALLOCATE(E_ZEEMAN(ID%D_BARE))
      U_ZEEMAN = 0.0
+ !    DO m=1,TOTAL_FREQUENCIES
+ !       FIELD(m)%X = FIELD(m)%X*exp(DCMPLX(0.0,1.0)*FIELD(m)%phi_x)
+ !       FIELD(m)%Y = FIELD(m)%Y*exp(DCMPLX(0.0,1.0)*FIELD(m)%phi_y)
+ !       FIELD(m)%Z = FIELD(m)%Z*exp(DCMPLX(0.0,1.0)*FIELD(m)%phi_z)
+ !    END DO
      DO m=1,TOTAL_FREQUENCIES
+!        FIELD(m)%OMEGA = HBAR*FIELD(m)%OMEGA/A        
         IF(m.EQ.1) THEN
            FIELD(m)%V = A*(MATMUL(I_x,J_x) - MATMUL(I_y,J_y) + MATMUL(I_z,J_z)) + &
                 &       mu_B*(g_J*(FIELD(m)%X*J_x  + DCMPLX(0.0,-1.0)*FIELD(m)%Y*J_y + FIELD(m)%Z*J_z) + &
                 &            (g_I*(FIELD(m)%X*I_x  + DCMPLX(0.0,-1.0)*FIELD(m)%Y*I_y + FIELD(m)%Z*I_z)))
            FIELD(m)%V = FIELD(m)%V/A
            U_ZEEMAN = FIELD(m)%V 
+           !CALL WRITE_MATRIX(ABS(U_ZEEMAN))
            CALL LAPACK_FULLEIGENVALUES(U_ZEEMAN,SIZE(FIELD(m)%V,1),E_ZEEMAN,INFO)
+           !CALL WRITE_MATRIX(ABS(U_ZEEMAN))
+           !WRITE(*,*) E_ZEEMAN
+           FIELD(m)%V = MATMUL(TRANSPOSE(CONJG(U_ZEEMAN)),MATMUL(FIELD(m)%V,U_ZEEMAN))
+           !call write_matrix(abs(field(m)%V))
         END IF
         
         IF(m.GT.1) THEN
+           !write(*,*) field(m)%X,field(m)%Y,field(m)%z,g_J,g_I,mu_B
            FIELD(m)%V = mu_B*(g_J*(FIELD(m)%X*J_x  + DCMPLX(0.0,-1.0)*FIELD(m)%Y*J_y + FIELD(m)%Z*J_z) + &
                 &            (g_I*(FIELD(m)%X*I_x  + DCMPLX(0.0,-1.0)*FIELD(m)%Y*I_y + FIELD(m)%Z*I_z)))
            FIELD(m)%V = FIELD(m)%V/A
+           !call write_matrix(abs(field(m)%V))
            FIELD(m)%V = MATMUL(TRANSPOSE(CONJG(U_ZEEMAN)),MATMUL(FIELD(m)%V,U_ZEEMAN))
+           !call write_matrix(abs(field(m)%V))
         END IF
      END DO
      
@@ -517,108 +544,3 @@ SUBROUTINE SETHAMILTONIANCOMPONENTS(ID,NM,NF,MODES_NUM,FIELD,INFO)
   
 END SUBROUTINE SETHAMILTONIANCOMPONENTS
 
-!!$SUBROUTINE SINGLEMODEFLOQUETMATRIX(ATOM_,FIELD,INFO)
-!!$
-!!$! SET UP THE HAMILTONIAN MATRIX PERFROMING A TRANSFORMATION TO A DOUBLE
-!!$! ROTATING FRAME
-!!$! ATOM_, IN, ATOM-TYPE, PARAMETERS OF AN ATOM
-!!$! FIELD, IN, FIELD-TYPE, FIELD PARAMETERS
-!!$! INFO, INOUT, INTEGER, ERROR FLAG
-!!$
-!!$
-!!$  USE FLOQUET
-!!$  USE ARRAYS
-!!$  USE ATOMIC_PROPERTIES
-!!$  USE TYPES
-!!$  USE SUBINTERFACE_LAPACK
-!!$
-!!$  IMPLICIT NONE
-!!$  INTEGER,                        INTENT(INOUT) :: INFO
-!!$  TYPE(MODE),DIMENSION(MODES_NUM),INTENT(IN)    :: FIELD
-!!$  TYPE(ATOM),                     INTENT(IN)    :: ATOM_
-!!$
-!!$  INTEGER m,n,D,r,o
-!!$  COMPLEX*16,       DIMENSION(:,:), ALLOCATABLE :: H_TEMP,H_STATIC,COUPLING,Z_M_COPY
-!!$  DOUBLE PRECISION, DIMENSION(:),   ALLOCATABLE :: E_DRESSED
-!!$  INTEGER index_l_lower,index_l_upper,index_r_lower,index_r_upper
-!!$
-!!$
-!!$  D        = ATOM_%D_BARE
-!!$  ALLOCATE(H_FLOQUET_COPY(D,D))
-!!$
-!!$  !write(*,*) D
-!!$  H_FLOQUET_COPY = FIELD(1)%V  ! STATIC HAMILTONIAN
-!!$
-!!$  !DEALLOCATE(COUPLING)
-!!$  DO n=2,MODES_NUM_DRESSING!2,2!MODES_NUM  ! RUN OVER EACH MODE
-!!$
-!!$     ! D : UPDATED AT THE ENDO OF THE LOOP. DIMENSION OF THE MULTIMODE FLOQUET MATRIX
-!!$
-!!$     H_STATIC  = H_FLOQUET_COPY
-!!$     DEALLOCATE(H_FLOQUET_COPY)
-!!$
-!!$     ALLOCATE(IDENTITY(D,D))
-!!$     IDENTITY  = 0.0
-!!$     DO m= 1,D
-!!$        IDENTITY(m,m) = 1.0
-!!$     END DO
-!!$
-!!$     !     WRITE(*,*) n,"COUPLIGN ALLOCATE",D
-!!$     ALLOCATE(COUPLING(D,D))
-!!$     COUPLING  = 0.0
-!!$
-!!$     DO r=1,(2*N_FLOQUET_DRESSING(n-1)+1)
-!!$
-!!$        index_l_lower = ATOM_%D_BARE*(r - 1) + 1
-!!$        index_l_upper = ATOM_%D_BARE*(r - 1) + ATOM_%D_BARE
-!!$        index_r_lower = index_l_lower
-!!$        index_r_upper = index_l_upper
-!!$        COUPLING(index_l_lower:index_l_upper, index_r_lower:index_r_upper) = &
-!!$             &     FIELD(n)%V  ! COUPLING MATRIX OF MODE n
-!!$        !        write(*,*) n,r,index_l_lower,index_l_upper
-!!$     END DO
-!!$
-!!$     D = D*(2*N_FLOQUET_DRESSING(n)+1)
-!!$     ALLOCATE(H_FLOQUET(D,D))
-!!$     H_FLOQUET = 0.0
-!!$
-!!$
-!!$     !    WRITE(*,*) SIZE(COUPLING,1),D
-!!$     DO m=-N_FLOQUET_DRESSING(n),N_FLOQUET_DRESSING(n)
-!!$
-!!$        index_l_lower = (m + N_FLOQUET_DRESSING(n)    )*SIZE(COUPLING,1) + 1
-!!$        index_l_upper = index_l_lower + SIZE(COUPLING,1) - 1
-!!$        index_r_lower =  index_l_lower
-!!$        index_r_upper =  index_l_upper
-!!$        H_FLOQUET(index_l_lower:index_l_upper, index_r_lower:index_r_upper) = &
-!!$             &  1.0*H_STATIC + 1.0*m*hbar*FIELD(n)%OMEGA*IDENTITY/A
-!!$        !        Observable_extended(index_l_lower:index_l_upper, index_r_lower:index_r_upper) = &
-!!$        !             &  Observable
-!!$
-!!$        IF(m.LT.N_FLOQUET_DRESSING(n)) THEN
-!!$
-!!$           index_l_lower =  (m + N_Floquet_DRESSING(n) + 1)*SIZE(COUPLING,1) + 1
-!!$           index_l_upper =  index_l_lower + SIZE(COUPLING,1) - 1
-!!$           index_r_lower =  (m + N_Floquet_DRESSING(n)    )*SIZE(COUPLING,1) + 1
-!!$           index_r_upper =  index_r_lower + SIZE(COUPLING,1) - 1
-!!$           H_FLOQUET(index_l_lower:index_l_upper, index_r_lower:index_r_upper) = &
-!!$                &     0.5*COUPLING
-!!$           !           write(*,*) index_l_lower,index_l_upper,index_r_lower,index_r_upper
-!!$
-!!$           index_l_lower =  (m + N_Floquet_DRESSING(n)    )*SIZE(COUPLING,1) + 1
-!!$           index_l_upper =  index_r_lower + SIZE(COUPLING,1)  - 1
-!!$           index_r_lower =  (m + N_Floquet_DRESSING(n) + 1)*SIZE(COUPLING,1) + 1
-!!$           index_r_upper =  index_l_lower + SIZE(COUPLING,1)  - 1
-!!$           H_FLOQUET(index_l_lower:index_l_upper, index_r_lower:index_r_upper) = &
-!!$                &     0.5*TRANSPOSE(CONJG(COUPLING))
-!!$        END IF
-!!$
-!!$     END DO
-!!$
-!!$     DEALLOCATE(IDENTITY)
-!!$     DEALLOCATE(COUPLING)
-!!$
-!!$  END DO
-!!$
-!!$END SUBROUTINE SINGLEMODEFLOQUETMATRIX
-!!$

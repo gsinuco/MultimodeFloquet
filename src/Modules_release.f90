@@ -9,6 +9,7 @@ MODULE ATOMIC_PROPERTIES
   DOUBLE PRECISION :: A,a_s,alpha_E
   INTEGER          :: Fup,Fdown,Ftotal
   INTEGER          :: Total_states_LSI
+  CHARACTER(LEN=7) :: ID_name
   
 !!$  !electro
 !!$  DOUBLE PRECISION, PARAMETER :: Ftotal      =  0.5
@@ -34,6 +35,7 @@ MODULE ATOMIC_PROPERTIES
   DOUBLE PRECISION :: alpha_E_87Rb = 2*pi*hbar*0.0794*1E-4
   INTEGER          :: Fup_87Rb     =  2
   INTEGER          :: Fdown_87Rb   =  1
+  CHARACTER(LEN=7) :: ID_name_87Rb = "87Rb"
 
   !6Li
   DOUBLE PRECISION :: I_6Li   =  1.0  
@@ -45,6 +47,7 @@ MODULE ATOMIC_PROPERTIES
   DOUBLE PRECISION :: alpha_E_6Li = 2*pi*hbar*0.0794*1E-4
   INTEGER          :: Fup_6Li     =  1
   INTEGER          :: Fdown_6Li   =  1
+  CHARACTER(LEN=7) :: ID_name_6Li = "6Li"
 
   !qubit
   DOUBLE PRECISION :: I_qubit   =  0.0
@@ -56,6 +59,8 @@ MODULE ATOMIC_PROPERTIES
   DOUBLE PRECISION :: alpha_E_qubit = 0.0
   INTEGER          :: Fup_qubit     =  1
   INTEGER          :: Fdown_qubit   =  1
+  CHARACTER(LEN=7) :: ID_name_qubit = "qubit"
+
 
   !spin
   DOUBLE PRECISION :: I_spin   =  0.0
@@ -67,6 +72,7 @@ MODULE ATOMIC_PROPERTIES
   DOUBLE PRECISION :: alpha_E_spin = 0.0
   INTEGER          :: Fup_spin     =  1
   INTEGER          :: Fdown_spin   =  1
+  CHARACTER(LEN=7) :: ID_name_spin = "spin"
 
   !6Li  !DOUBLE PRECISION, PARAMETER :: I=1.0  
   !DOUBLE PRECISION, PARAMETER :: g_J = 2.0023010

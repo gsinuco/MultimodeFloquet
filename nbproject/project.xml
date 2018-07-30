@@ -4,8 +4,8 @@
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/make-project/1">
             <name>release</name>
-            <c-extensions/>
-            <cpp-extensions>cpp</cpp-extensions>
+            <c-extensions>cpp</c-extensions>
+            <cpp-extensions/>
             <header-extensions>h</header-extensions>
             <sourceEncoding>UTF-8</sourceEncoding>
             <make-dep-projects/>
@@ -15,6 +15,10 @@
             <confList>
                 <confElem>
                     <name>Default</name>
+                    <type>0</type>
+                </confElem>
+                <confElem>
+                    <name>Copy_of_Default</name>
                     <type>0</type>
                 </confElem>
             </confList>

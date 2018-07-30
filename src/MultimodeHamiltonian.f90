@@ -28,19 +28,23 @@ SUBROUTINE MULTIMODEFLOQUETMATRIX(ATOM_,NM,NF,MODES_NUM,FIELD,INFO)
 
   INTEGER, DIMENSION(NM) :: N_FLOQUET
 
+  write(*,*) "# Creating the multimode hamiltonian for a", ID_name
+  write(*,*) "# with ", NM," modes and ", NF, "frequencies"
+  
   INFO      = 0
   N_FLOQUET = 0
-
+  !write(*,*) "FORTRAN MULTIMODEFLOQUETMATRIX SAYS:",nm 
   DO n=2,NM
      FIELD_INDEX = 2+SUM(MODES_NUM(2:n-1))
      N_FLOQUET(n)=FIELD(FIELD_INDEX)%N_Floquet
-!     write(*,*) n,N_FLOQUET(n),field_index,modes_num(n),NM,NF
+ !    write(*,*) n,N_FLOQUET(n),field_index,modes_num(n),NM,NF,info,n
      IF(modes_num(n).GT.N_FLOQUET(n)+1) THEN
         WRITE(*,*) "TO BUILD THE EXTENDED HAMILTONIAN THE NUMBER OF FLOQUET MODES MUST BE DEFINED"
         WRITE(*,*) "LARGER THAN THE NUMBER OF FIELD MODES"
         INFO = -10
      END IF
   END DO
+  write(*,*) "# Floquet modes:", N_FLOQUET
 
   IF(INFO.EQ.0) THEN
      D_OLD    = 1
@@ -90,7 +94,7 @@ SUBROUTINE MULTIMODEFLOQUETMATRIX(ATOM_,NM,NF,MODES_NUM,FIELD,INFO)
         END DO
         FIELD_INDEX =2+SUM(MODES_NUM(2:n-1))
 
-        !        write(*,*) n,N_FLOQUET(n),field_index
+!        write(*,*) n,N_FLOQUET(n),field_index,field(field_index)%omega
         !        write(*,*) n,FIELD_INDEX,N_Floquet(n),FIELD(FIELD_INDEX)%OMEGA
         D_OLD = D
         D     = D*(2*N_FLOQUET(n)+1)
@@ -111,6 +115,7 @@ SUBROUTINE MULTIMODEFLOQUETMATRIX(ATOM_,NM,NF,MODES_NUM,FIELD,INFO)
                    & TRANSPOSE(CONJG(H_FLOQUET_ROW(1:D_OLD,1:index_aux)))
            END IF
            H_FLOQUET(index_r_lower:index_r_upper,index_r_lower:index_r_upper) = H_STATIC + m*FIELD(FIELD_INDEX)%OMEGA*identity
+ !          write(*,*) m,n,m*FIELD(FIELD_INDEX)%OMEGA,field_index,n_floquet(n)
         END DO
         !END IF
 !!$        ELSE IF(NF.EQ.NM) THEN
@@ -169,8 +174,9 @@ SUBROUTINE MULTIMODEFLOQUETMATRIX(ATOM_,NM,NF,MODES_NUM,FIELD,INFO)
         END IF
 
      END DO
+     write(*,*) "# Dimension of the matrix:", size(H_FLOQUET,1)
 
-     !     CALL WRITE_MATRIX(real(H_FLOQUET))
+!     CALL WRITE_MATRIX(real(H_FLOQUET))
   ELSE
 
   END IF

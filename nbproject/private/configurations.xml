@@ -9,8 +9,11 @@
       <df name="examples">
         <df name="CPP">
           <in>MultimodeFloquet.h</in>
+          <in>main_DressedQubit.cpp</in>
+          <in>main_DressedQubit_sp.cpp</in>
           <in>main_qubit.cpp</in>
-          <in>main_qubit.f90</in>
+          <in>main_qubit_sp.cpp</in>
+          <in>main_release.cpp</in>
         </df>
         <df name="FORTRAN">
           <in>main_DressedQubit.f90</in>
@@ -18,7 +21,24 @@
           <in>main_Release.f90</in>
           <in>main_qubit.f90</in>
           <in>main_qubit_SP.f90</in>
+          <in>newfile.cpp</in>
         </df>
+      </df>
+      <df name="include">
+        <in>arrays.mod</in>
+        <in>atomic_properties.mod</in>
+        <in>feast.mod</in>
+        <in>floquetinit_.mod</in>
+        <in>funciones.mod</in>
+        <in>mergingarrays.mod</in>
+        <in>mergingarrays_c.mod</in>
+        <in>modes_4f.mod</in>
+        <in>physical_constants.mod</in>
+        <in>sparse_interface.mod</in>
+        <in>subinterface.mod</in>
+        <in>subinterface_lapack.mod</in>
+        <in>types.mod</in>
+        <in>types_c.mod</in>
       </df>
       <df name="lib">
       </df>
@@ -41,7 +61,7 @@
         <in>MultimodeDressedBasis.f90</in>
         <in>MultimodeDressedBasis_C.f90</in>
         <in>MultimodeDressedBasis_SP.f90</in>
-        <in>MultimodeFloquet.f90</in>
+        <in>MultimodeDressedBasis_SP_C.f90</in>
         <in>MultimodeFloquet.h</in>
         <in>MultimodeFloquetTE.f90</in>
         <in>MultimodeFloquetTE_C.f90</in>
@@ -67,6 +87,8 @@
         <in>main_qubit.f90</in>
         <in>main_qubit_SP.f90</in>
         <in>main_qubit_sp.cpp</in>
+        <in>main_random.f90</in>
+        <in>main_release.cpp</in>
         <in>modes.f90</in>
         <in>modes_C.f90</in>
         <in>quick-sort-index-table.f90</in>
@@ -74,25 +96,65 @@
         <in>util.f90</in>
         <in>util_c.f90</in>
       </df>
-      <in>arrays.mod</in>
       <in>atomic_properties.mod</in>
-      <in>feast.mod</in>
-      <in>floquetinit_.mod</in>
       <in>funciones.mod</in>
       <in>mergingarrays.mod</in>
       <in>mergingarrays_c.mod</in>
       <in>modes_4f.mod</in>
-      <in>physical_constants.mod</in>
       <in>sparse_interface.mod</in>
       <in>subinterface.mod</in>
       <in>subinterface_lapack.mod</in>
-      <in>types.mod</in>
       <in>types_c.mod</in>
     </df>
   </logicalFolder>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="Default" type="0">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <platform>2</platform>
+      </toolsSet>
+      <compile>
+        <compiledirpicklist>
+          <compiledirpicklistitem>.</compiledirpicklistitem>
+          <compiledirpicklistitem>${AUTO_FOLDER}</compiledirpicklistitem>
+        </compiledirpicklist>
+        <compiledir>${AUTO_FOLDER}</compiledir>
+        <compilecommandpicklist>
+          <compilecommandpicklistitem>${MAKE} ${ITEM_NAME}.o</compilecommandpicklistitem>
+          <compilecommandpicklistitem>${AUTO_COMPILE}</compilecommandpicklistitem>
+        </compilecommandpicklist>
+        <compilecommand>${AUTO_COMPILE}</compilecommand>
+      </compile>
+      <dbx_gdbdebugger version="1">
+        <gdb_pathmaps>
+        </gdb_pathmaps>
+        <gdb_interceptlist>
+          <gdbinterceptoptions gdb_all="false" gdb_unhandled="true" gdb_unexpected="true"/>
+        </gdb_interceptlist>
+        <gdb_options>
+          <DebugOptions>
+          </DebugOptions>
+        </gdb_options>
+        <gdb_buildfirst gdb_buildfirst_overriden="false" gdb_buildfirst_old="false"/>
+      </dbx_gdbdebugger>
+      <nativedebugger version="1">
+        <engine>gdb</engine>
+      </nativedebugger>
+      <runprofile version="9">
+        <runcommandpicklist>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
+        </runcommandpicklist>
+        <runcommand>"${OUTPUT_PATH}"</runcommand>
+        <rundir>.</rundir>
+        <buildfirst>false</buildfirst>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+    <conf name="Copy_of_Default" type="0">
       <toolsSet>
         <developmentServer>localhost</developmentServer>
         <platform>2</platform>

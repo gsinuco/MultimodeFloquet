@@ -1,12 +1,12 @@
 SUBROUTINE WRITE_MATRIX(A)
 ! it writes a matrix of doubles nxm on the screen
   DOUBLE PRECISION, DIMENSION(:,:) :: A
-  CHARACTER(LEN=65) STRING
-  CHARACTER(LEN=55) aux_char
+  CHARACTER(LEN=105) STRING
+  CHARACTER(LEN=105) aux_char
   integer :: aux
 
   aux = int(UBOUND(A,2))
-!  write(*,*) aux
+  !write(*,*) aux
   write(aux_char,"(I4)") aux
   aux_char = trim(aux_char)
   write(string,"(A1,I4,A6)") "(",aux,"E15.6)"

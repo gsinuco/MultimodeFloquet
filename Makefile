@@ -1,43 +1,64 @@
-export LD_LIBRARY_PATH="/opt/intel/compilers_and_libraries_2017/linux/mkl/lib/intel64"
-
+#export LD_LIBRARY_PATH="/opt/intel/compilers_and_libraries_2017/linux/mkl/lib/intel64"
+# SET FORTRAN AND CPP COMPILERS
 CPP = g++
-CC = gcc
+CC  = gcc
 GF  = gfortran
 AR  = ar 
 RANLIB = ranlib
-# Use in zeeman
-GFFLAGS    =  -lgsl -lgslcblas -O3 -llapack -lblas -g
-GFFLAGS_SP =  -m64  -w -fno-second-underscore -x f77-cpp-input  -lpthread -lm -ldl -lgsl -lgslcblas -O3 -llapack -lblas -g
-MKLFLAGS   =  -lmkl_gf_lp64 -lmkl_sequential -lmkl_core
-CFLAGS     =  -lgsl -lgslcblas -O3  -static
 
+# SET REQUIRED FLAGS
+GFFLAGS    =  -lgsl -lgslcblas -llapack -lblas -g
+GFFLAGS_SP =  -m64  -w -fno-second-underscore -x f77-cpp-input  -lpthread -lm -ldl -lgsl -lgslcblas  -llapack -lblas -g
+MKLFLAGS   =  -lmkl_gf_lp64 -lmkl_sequential -lmkl_core
+CFLAGS     =  -lgsl -lgslcblas   -static
+
+#SET MKL-intel LIBRARY PATH
 MKLLIBS = /opt/intel/compilers_and_libraries/linux/mkl/lib/intel64
+#SET MKL-intel INCLUDE PATH
 MKLINC = /opt/intel/compilers_and_libraries/linux/mkl/include	
 
-# Use in apollo:
-#GFFLAGS = -L/usr/lib64/atlas/lib $(GSL_INCL) $(GSL_LIBS) -llapack -lblas -g -lgsl -lgslcblas -O3  
-#CFLAGS =   $(GSL_INCL) $(GSL_LIBS) -lgsl -lgslcblas -O3
-
+###################################
+# MAKE LIBRARY AND ALL EXECUTABLES
+###################################
 
 all: build/MultimodeFloquetDressedQubit_C build/MultimodeFloquetDressedQubit build/MultimodeFloquetQubit build/MultimodeFloquetQubit_C build/MultimodeFloquetQubit_SP build/MultimodeFloquetQubit_SP_C build/MultimodeFloquetDressedQubit_SP_C build/MultimodeFloquetDressedQubit_SP
-	
-#build/MultimodeFloquetQubit_SP Example_lib_sp build/MultimodeFloquetQubit_new Example_lib  build/MultimodeFloquetDressedQubit build/MultimodeFloquetDressedQubit_SP build/MultimodeFloquetCinterface
 
-lib: build/modes.o build/Modules.o build/Modules_release.o build/util.o build/delta_kr.o build/I_and_J_representations.o build/F_representation.o build/Floquet.o build/VarCRSPacking.o build/quick-sort-index-table.o build/sparse_utils.o  build/LapackEigenValues.o build/MKLSparseEigenValues.o build/MultimodeFloquetTE.o  build/MultimodeMicroMotion.o build/MultimodeTransitionAVG.o build/MultimodeHamiltonian_SP.o build/MultimodeHamiltonian.o 
+all_examples: Example_lib Example_lib_sp Example_lib_c Example_lib_c_sp
+	
+	
+lib:build/modes.o build/Modules.o build/Modules_release.o build/delta_kr.o build/Floquet.o \
+ build/I_and_J_representations.o build/F_representation.o build/LapackEigenValues.o \
+ build/MKLSparseEigenValues.o build/util.o build/quick-sort-index-table.o build/VarCRSPacking.o \
+ build/sparse_utils.o build/MultimodeHamiltonian_SP.o build/MultimodeHamiltonian.o \
+ build/MultimodeFloquetTE.o build/MultimodeFloquetTE_DRIVER.o build/MultimodeMicroMotion.o \
+ build/MultimodeTransitionAVG.o build/MultimodeDressedBasis.o build/MultimodeDressedBasis_SP.o \
+ build/util_c.o build/modes_C.o build/Floquet_init_C.o build/MultimodeHamiltonian_SP_C.o  \
+ build/MultimodeHamiltonian_C.o build/LapackEigenValues_C.o build/MultimodeTransitionAVG_C.o \
+ build/MultimodeMicroMotion_C.o build/MultimodeFloquetTE_DRIVER_C.o build/MultimodeFloquetTE_C.o \
+ build/MultimodeDressedBasis_C.o build/MultimodeDressedBasis_SP_C.o build/MKLSparseEigenValues_C.o 
 	$(AR) -urv lib/libmultimodefloquet.a build/*.o
 	$(RANLIB) lib/libmultimodefloquet.a
+	cp *.mod ./include/
 
-Example_lib: ./examples/FORTRAN/main_DressedQubit.f90 
-	$(GF) -o ./examples/FORTRAN/$@  ./examples/FORTRAN/main_DressedQubit.f90 -L./lib/ -lmultimodefloquet $(GFFLAGS)
+Example_lib: ./examples/FORTRAN/main_qubit.f90  ./examples/FORTRAN/main_DressedQubit.f90
+	$(GF) -o ./examples/FORTRAN/qubit  ./examples/FORTRAN/main_qubit.f90 -I./include/ -L./lib/ -lmultimodefloquet $(GFFLAGS)
+	$(GF) -o ./examples/FORTRAN/dressedqubit  ./examples/FORTRAN/main_DressedQubit.f90 -I./include/ -L./lib/ -lmultimodefloquet $(GFFLAGS)
 
-#Example_lib_sp: ./examples/FORTRAN/main_DressedQubit_SP.f90 
-#$(GF) -o ./examples/FORTRAN/$@  ./examples/FORTRAN/main_DressedQubit_SP.f90 -L./lib/ -lmultimodefloquet -L$(MKLLIBS) -I$(MKLINC) $(GFFLAGS_SP) $(MKLFLAGS)
+Example_lib_sp: ./examples/FORTRAN/main_qubit_SP.f90 ./examples/FORTRAN/main_DressedQubit_SP.f90
+	$(GF) -o ./examples/FORTRAN/qubit_sp  ./examples/FORTRAN/main_qubit_SP.f90 -I./include/ -L./lib/ -lmultimodefloquet -L$(MKLLIBS) -I$(MKLINC) $(GFFLAGS_SP) $(MKLFLAGS)
+	$(GF) -o ./examples/FORTRAN/dressedqubit_sp  ./examples/FORTRAN/main_DressedQubit_SP.f90 -I./include/ -L./lib/ -lmultimodefloquet -L$(MKLLIBS) -I$(MKLINC) $(GFFLAGS_SP) $(MKLFLAGS)
 
-Example_lib_sp: ./examples/FORTRAN/main_qubit_SP.f90 
-	$(GF) -o ./examples/FORTRAN/$@  ./examples/FORTRAN/main_qubit_SP.f90 -L./lib/ -lmultimodefloquet -L$(MKLLIBS) -I$(MKLINC) $(GFFLAGS_SP) $(MKLFLAGS)
+Example_lib_c: ./examples/CPP/main_qubit.cpp  ./examples/CPP/main_DressedQubit.cpp
+	$(CPP) -o ./examples/CPP/qubit  ./examples/CPP/main_qubit.cpp -I./include/ -L./lib/ -lmultimodefloquet -lgfortran $(GFFLAGS)
+	$(CPP) -o ./examples/CPP/dressedqubit  ./examples/CPP/main_DressedQubit.cpp -I./include/ -L./lib/ -lmultimodefloquet -lgfortran $(GFFLAGS)
 
+Example_lib_c_sp: ./examples/CPP/main_qubit_sp.cpp ./examples/CPP/main_DressedQubit_sp.cpp
+	$(CPP) -o  ./examples/CPP/qubit_sp         ./examples/CPP/main_qubit_sp.cpp        -I./include/ -L./lib/ -lmultimodefloquet -lgfortran -L$(MKLLIBS) -I$(MKLINC) $(GFFLAGS_SP) $(MKLFLAGS)         
+	$(CPP) -o  ./examples/CPP/dressedqubit_sp  ./examples/CPP/main_DressedQubit_sp.cpp -I./include/ -L./lib/ -lmultimodefloquet -lgfortran -L$(MKLLIBS) -I$(MKLINC) $(GFFLAGS_SP) $(MKLFLAGS)
 
-
+###################################
+# MAKE CPP EXECUTABLES
+###################################
 
 build/MultimodeFloquetQubit_SP_C:        build/modes.o build/modes_C.o build/Modules.o build/Modules_release.o build/util.o build/util_c.o build/sparse_utils.o build/delta_kr.o build/I_and_J_representations.o build/F_representation.o build/LapackEigenValues.o build/VarCRSPacking.o build/quick-sort-index-table.o build/Floquet.o build/Floquet_init_C.o build/MultimodeHamiltonian_SP.o build/MultimodeHamiltonian_SP_C.o build/MKLSparseEigenValues.o build/MKLSparseEigenValues_C.o build/MultimodeTransitionAVG.o build/MultimodeTransitionAVG_C.o  build/MultimodeMicroMotion.o build/MultimodeMicroMotion_C.o build/MultimodeFloquetTE.o build/MultimodeFloquetTE_C.o src/main_qubit_sp.cpp
 	$(CPP) -o $@                     build/modes.o build/modes_C.o build/Modules.o build/Modules_release.o build/util.o build/util_c.o build/sparse_utils.o build/delta_kr.o build/I_and_J_representations.o build/F_representation.o build/LapackEigenValues.o build/VarCRSPacking.o build/quick-sort-index-table.o build/Floquet.o build/Floquet_init_C.o build/MultimodeHamiltonian_SP.o build/MultimodeHamiltonian_SP_C.o build/MKLSparseEigenValues.o build/MKLSparseEigenValues_C.o build/MultimodeTransitionAVG.o build/MultimodeTransitionAVG_C.o  build/MultimodeMicroMotion.o build/MultimodeMicroMotion_C.o build/MultimodeFloquetTE.o build/MultimodeFloquetTE_C.o src/main_qubit_sp.cpp -lgfortran -L$(MKLLIBS) -I$(MKLINC) $(GFFLAGS_SP) $(MKLFLAGS)
@@ -51,58 +72,72 @@ build/MultimodeFloquetQubit_C: build/modes.o build/modes_C.o build/Modules.o bui
 build/MultimodeFloquetDressedQubit_C: build/modes.o build/modes_C.o build/Modules.o build/Modules_release.o build/util.o build/util_c.o build/delta_kr.o build/I_and_J_representations.o build/F_representation.o build/LapackEigenValues.o build/Floquet.o build/Floquet_init_C.o build/MultimodeHamiltonian.o build/MultimodeHamiltonian_C.o build/LapackEigenValues_C.o  build/MultimodeTransitionAVG.o build/MultimodeTransitionAVG_C.o  build/MultimodeMicroMotion.o build/MultimodeMicroMotion_C.o build/MultimodeFloquetTE.o build/MultimodeFloquetTE_C.o build/MultimodeDressedBasis.o build/MultimodeDressedBasis_C.o src/main_DressedQubit.cpp
 	$(CPP) -o $@                  build/modes.o build/modes_C.o build/Modules.o build/Modules_release.o build/util.o build/util_c.o build/delta_kr.o build/I_and_J_representations.o build/F_representation.o build/LapackEigenValues.o build/Floquet.o build/Floquet_init_C.o build/MultimodeHamiltonian.o build/MultimodeHamiltonian_C.o build/LapackEigenValues_C.o  build/MultimodeTransitionAVG.o build/MultimodeTransitionAVG_C.o  build/MultimodeMicroMotion.o build/MultimodeMicroMotion_C.o build/MultimodeFloquetTE.o build/MultimodeFloquetTE_C.o build/MultimodeDressedBasis.o build/MultimodeDressedBasis_C.o src/main_DressedQubit.cpp -lgfortran   $(GFFLAGS) 
 
-
-
-
+####################################
+# BUILD OBJECT FILES FOR CPP WRAPPER
+#####################################
 build/util_c.o: build/util.o build/modes.o src/util_c.f90
 	$(GF) -c -o $@ build/modes.o build/util.o src/util_c.f90 -g
-	
+
 build/modes_C.o: build/modes.o src/modes_C.f90
 	$(GF) -c -o $@ build/modes.o src/modes_C.f90  -g
 
 build/Floquet_init_C.o: build/modes.o build/modes_C.o src/Floquet_init_C.f90
-	$(GF) -c -o $@ build/modes.o build/modes_C.o src/Floquet_init_C.f90 -O3 -g
+	$(GF) -c -o $@ build/modes.o build/modes_C.o src/Floquet_init_C.f90  -g
 
 build/MultimodeHamiltonian_SP_C.o: build/MultimodeHamiltonian_SP.o src/MultimodeHamiltonian_SP_C.f90
-	$(GF) -c -o $@  src/MultimodeHamiltonian_SP_C.f90 -O3 -g
+	$(GF) -c -o $@  src/MultimodeHamiltonian_SP_C.f90 -g
 
 build/MultimodeHamiltonian_C.o: build/MultimodeHamiltonian.o src/MultimodeHamiltonian_C.f90
-	$(GF) -c -o $@  build/MultimodeHamiltonian.o src/MultimodeHamiltonian_C.f90 -O3 -g
+	$(GF) -c -o $@  build/MultimodeHamiltonian.o src/MultimodeHamiltonian_C.f90  -g
 
 build/LapackEigenValues_C.o: build/Modules.o build/LapackEigenValues.o src/LapackEigenValues_C.f90
-	$(GF) -c -o $@ build/Modules.o build/LapackEigenValues.o src/LapackEigenValues_C.f90 -O3 -g
+	$(GF) -c -o $@ build/Modules.o build/LapackEigenValues.o src/LapackEigenValues_C.f90  -g
 
 build/MultimodeTransitionAVG_C.o: build/modes_C.o build/MultimodeTransitionAVG.o src/MultimodeTransitionAVG_C.f90
-	$(GF) -c -o $@  build/modes_C.o build/MultimodeTransitionAVG.o src/MultimodeTransitionAVG_C.f90 -O3 -g
+	$(GF) -c -o $@  build/modes_C.o build/MultimodeTransitionAVG.o src/MultimodeTransitionAVG_C.f90  -g
 
 build/MultimodeMicroMotion_C.o: build/modes_C.o build/MultimodeMicroMotion.o src/MultimodeMicroMotion_C.f90
-	$(GF) -c -o $@  build/modes_C.o build/MultimodeMicroMotion.o src/MultimodeMicroMotion_C.f90 -O3 -g
+	$(GF) -c -o $@  build/modes_C.o build/MultimodeMicroMotion.o src/MultimodeMicroMotion_C.f90  -g
 
 build/MultimodeFloquetTE_DRIVER_C.o: build/modes_C.o build/MultimodeFloquetTE_DRIVER.o src/MultimodeFloquetTE_DRIVER_C.f90
-	$(GF) -c -o $@  build/modes_C.o build/MultimodeFloquetTE_DRIVER_.o src/MultimodeFloquetTE_DRIVER_C.f90 -O3 -g
+	$(GF) -c -o $@  build/modes_C.o build/MultimodeFloquetTE_DRIVER.o src/MultimodeFloquetTE_DRIVER_C.f90  -g
 
 build/MultimodeFloquetTE_C.o: build/modes_C.o build/MultimodeFloquetTE.o src/MultimodeFloquetTE_C.f90
-	$(GF) -c -o $@  build/modes_C.o build/MultimodeFloquetTE.o src/MultimodeFloquetTE_C.f90 -O3 -g
+	$(GF) -c -o $@  build/modes_C.o build/MultimodeFloquetTE.o src/MultimodeFloquetTE_C.f90  -g
 
 build/MultimodeDressedBasis_C.o: build/modes_C.o  build/MultimodeDressedBasis.o src/MultimodeDressedBasis_C.f90
-	$(GF) -o $@ -c build/modes_C.o  build/MultimodeDressedBasis.o src/MultimodeDressedBasis_C.f90 -O3 -g
+	$(GF) -o $@ -c build/modes_C.o  build/MultimodeDressedBasis.o src/MultimodeDressedBasis_C.f90  -g
 
 build/MultimodeDressedBasis_SP_C.o: build/modes_C.o  build/MultimodeDressedBasis_SP.o src/MultimodeDressedBasis_SP_C.f90
-	$(GF) -o $@ -c build/modes_C.o  build/MultimodeDressedBasis_SP.o src/MultimodeDressedBasis_SP_C.f90 -O3 -g
+	$(GF) -o $@ -c build/modes_C.o  build/MultimodeDressedBasis_SP.o src/MultimodeDressedBasis_SP_C.f90  -g
 
 build/MKLSparseEigenValues_C.o: build/MKLSparseEigenValues.o src/MKLSparseEigenvalues_C.f90
-	$(GF) -c -o $@ src/MKLSparseEigenvalues_C.f90 -O3 -g
+	$(GF) -c -o $@ src/MKLSparseEigenvalues_C.f90  -g
 
 
+#build/util_c.o
+#build/modes_C.o
+#build/Floquet_init_C.o
+#build/MultimodeHamiltonian_SP_C.o
+#build/MultimodeHamiltonian_C.o
+#build/LapackEigenValues_C.o
+#build/MultimodeTransitionAVG_C.o
+#build/MultimodeMicroMotion_C.o
+#build/MultimodeFloquetTE_DRIVER_C.o
+#build/MultimodeFloquetTE_C.o
+#build/MultimodeDressedBasis_C.o
+#build/MultimodeDressedBasis_SP_C.o
+#build/MKLSparseEigenValues_C.o
 
-
-
+############################
+# BUILD FORTRAN EXECUTABLE
+############################
 
 build/MultimodeFloquetDressedQubit_SP:  build/modes.o  build/Modules.o build/Modules_release.o build/util.o build/delta_kr.o build/I_and_J_representations.o build/F_representation.o build/Floquet.o build/VarCRSPacking.o build/quick-sort-index-table.o build/LapackEigenValues.o build/sparse_utils.o build/MKLSparseEigenValues.o build/MultimodeFloquetTE.o build/MultimodeMicroMotion.o build/MultimodeTransitionAVG.o  build/MultimodeHamiltonian_SP.o build/MultimodeDressedBasis_SP.o src/main_DressedQubit_SP.f90 
-	$(GF) -o $@                     build/modes.o  build/Modules.o build/Modules_release.o build/util.o build/delta_kr.o build/I_and_J_representations.o build/F_representation.o build/Floquet.o build/VarCRSPacking.o build/quick-sort-index-table.o build/LapackEigenValues.o  build/sparse_utils.o build/MKLSparseEigenValues.o build/MultimodeFloquetTE.o build/MultimodeMicroMotion.o build/MultimodeTransitionAVG.o  build/MultimodeHamiltonian_SP.o build/MultimodeDressedBasis_SP.o build/MultimodeHamiltonian.o src/main_DressedQubit_SP.f90 -L$(MKLLIBS) -I$(MKLINC) $(GFFLAGS_SP) $(MKLFLAGS)
+	$(GF) -o $@                     build/modes.o  build/Modules.o build/Modules_release.o build/util.o build/delta_kr.o build/I_and_J_representations.o build/F_representation.o build/Floquet.o build/VarCRSPacking.o build/quick-sort-index-table.o build/LapackEigenValues.o  build/sparse_utils.o build/MKLSparseEigenValues.o build/MultimodeFloquetTE.o build/MultimodeMicroMotion.o build/MultimodeTransitionAVG.o  build/MultimodeHamiltonian_SP.o build/MultimodeDressedBasis_SP.o src/main_DressedQubit_SP.f90 -L$(MKLLIBS) -I$(MKLINC) $(GFFLAGS_SP) $(MKLFLAGS)
 
-build/MultimodeFloquetDressedQubit:  build/modes.o build/Modules.o build/Modules_release.o build/util.o build/delta_kr.o build/I_and_J_representations.o build/F_representation.o build/Floquet.o  build/VarCRSPacking.o build/quick-sort-index-table.o build/LapackEigenValues.o build/MultimodeFloquetTE.o  build/MultimodeMicroMotion.o build/MultimodeTransitionAVG.o build/MultimodeHamiltonian.o src/main_DressedQubit.f90 
-	$(GF) -o $@ build/modes.o build/Modules.o  build/Modules_release.o build/util.o build/delta_kr.o build/I_and_J_representations.o build/F_representation.o build/Floquet.o build/VarCRSPacking.o build/quick-sort-index-table.o build/LapackEigenValues.o  build/MultimodeFloquetTE.o  build/MultimodeMicroMotion.o build/MultimodeTransitionAVG.o build/MultimodeHamiltonian.o src/main_DressedQubit.f90  $(GFFLAGS) 
+build/MultimodeFloquetDressedQubit:  build/modes.o build/Modules.o build/Modules_release.o build/util.o build/delta_kr.o build/I_and_J_representations.o build/F_representation.o build/Floquet.o  build/VarCRSPacking.o build/quick-sort-index-table.o build/LapackEigenValues.o build/MultimodeFloquetTE.o  build/MultimodeMicroMotion.o build/MultimodeTransitionAVG.o build/MultimodeHamiltonian.o build/MultimodeDressedBasis.o src/main_DressedQubit.f90 
+	$(GF) -o $@ build/modes.o build/Modules.o  build/Modules_release.o build/util.o build/delta_kr.o build/I_and_J_representations.o build/F_representation.o build/Floquet.o build/VarCRSPacking.o build/quick-sort-index-table.o build/LapackEigenValues.o  build/MultimodeFloquetTE.o  build/MultimodeMicroMotion.o build/MultimodeTransitionAVG.o build/MultimodeHamiltonian.o  build/MultimodeDressedBasis.o  src/main_DressedQubit.f90  $(GFFLAGS) 
 
 build/MultimodeFloquetQubit_SP:  build/modes.o build/Modules.o build/Modules_release.o build/util.o build/delta_kr.o build/I_and_J_representations.o build/F_representation.o build/Floquet.o build/VarCRSPacking.o build/quick-sort-index-table.o build/sparse_utils.o  build/LapackEigenValues.o build/MKLSparseEigenValues.o build/MultimodeFloquetTE.o  build/MultimodeMicroMotion.o build/MultimodeTransitionAVG.o build/MultimodeHamiltonian_SP.o src/main_qubit_SP.f90 
 	$(GF) -o $@              build/modes.o build/Modules.o build/Modules_release.o build/util.o build/delta_kr.o build/I_and_J_representations.o build/F_representation.o build/Floquet.o  build/VarCRSPacking.o build/quick-sort-index-table.o build/sparse_utils.o  build/LapackEigenValues.o  build/MKLSparseEigenValues.o build/MultimodeFloquetTE.o build/MultimodeMicroMotion.o build/MultimodeTransitionAVG.o  build/MultimodeHamiltonian_SP.o src/main_qubit_SP.f90  -L$(MKLLIBS) -I$(MKLINC) $(GFFLAGS_SP) $(MKLFLAGS)
@@ -110,84 +145,109 @@ build/MultimodeFloquetQubit_SP:  build/modes.o build/Modules.o build/Modules_rel
 build/MultimodeFloquetQubit:  build/modes.o build/Modules.o build/Modules_release.o build/util.o build/delta_kr.o build/I_and_J_representations.o build/F_representation.o build/Floquet.o build/VarCRSPacking.o build/quick-sort-index-table.o build/sparse_utils.o  build/LapackEigenValues.o build/MultimodeFloquetTE.o build/MultimodeMicroMotion.o build/MultimodeTransitionAVG.o  build/MultimodeHamiltonian.o src/main_qubit.f90 
 	$(GF) -o $@ build/modes.o build/Modules.o  build/Modules_release.o build/util.o build/delta_kr.o build/I_and_J_representations.o build/F_representation.o build/Floquet.o build/VarCRSPacking.o build/quick-sort-index-table.o build/sparse_utils.o  build/LapackEigenValues.o build/MultimodeFloquetTE.o  build/MultimodeMicroMotion.o build/MultimodeTransitionAVG.o build/MultimodeHamiltonian.o src/main_qubit.f90  $(GFFLAGS) 
 
-#build/MultimodeFloquetQubit_old:  build/modes.o build/Modules.o build/Modules_release.o build/util.o build/delta_kr.o build/I_and_J_representations.o build/F_representation.o build/Floquet.o build/VarCRSPacking.o build/quick-sort-index-table.o build/sparse_utils.o  build/LapackEigenValues.o build/MultimodeFloquet.o src/main_qubit.f90 
-#	$(GF) -o $@ build/modes.o build/Modules.o  build/Modules_release.o build/util.o build/delta_kr.o build/I_and_J_representations.o build/F_representation.o build/Floquet.o build/VarCRSPacking.o build/quick-sort-index-table.o build/sparse_utils.o  build/LapackEigenValues.o build/MultimodeFloquet.o src/main_qubit.f90  $(GFFLAGS) 
-
-#build/MultimodeFloquetQubit:  build/modes.o build/Modules.o build/Modules_release.o build/util.o build/delta_kr.o build/I_and_J_representations.o build/F_representation.o build/Floquet.o build/VarCRSPacking.o build/quick-sort-index-table.o build/sparse_utils.o  build/LapackEigenValues.o build/MultimodeFloquetTE.o build/MultimodeHamiltonian.o src/main_qubit.f90 
-#	$(GF) -o $@ build/modes.o build/Modules.o  build/Modules_release.o build/util.o build/delta_kr.o build/I_and_J_representations.o build/F_representation.o build/Floquet.o build/VarCRSPacking.o build/quick-sort-index-table.o build/sparse_utils.o  build/LapackEigenValues.o build/MultimodeFloquetTE.o build/MultimodeHamiltonian.o src/main_qubit.f90  $(GFFLAGS) 
-
 
 build/MultimodeFloquetRelease:  build/modes.o build/Modules.o build/Modules_release.o build/util.o build/delta_kr.o build/I_and_J_representations.o build/F_representation.o build/Floquet.o build/VarCRSPacking.o build/quick-sort-index-table.o build/sparse_utils.o  build/LapackEigenValues.o build/MKLSparseEigenValues.o build/MultimodeFloquetTE.o build/MultimodeMicroMotion.o build/MultimodeTransitionAVG.o build/MultimodeHamiltonian_SP.o build/MultimodeHamiltonian.o src/main_Release.f90 
 	$(GF) -o $@ build/modes.o build/Modules.o build/Modules_release.o build/util.o build/delta_kr.o build/I_and_J_representations.o build/F_representation.o build/Floquet.o   build/VarCRSPacking.o build/quick-sort-index-table.o build/sparse_utils.o  build/LapackEigenValues.o  build/MKLSparseEigenValues.o build/MultimodeFloquetTE.o  build/MultimodeMicroMotion.o build/MultimodeTransitionAVG.o build/MultimodeHamiltonian_SP.o build/MultimodeHamiltonian.o src/main_Release.f90  -L$(MKLLIBS) -I$(MKLINC) $(GFFLAGS_SP) $(MKLFLAGS)
 
 
-
+############################
+# BUILD FORTRAN OBJECT FILES
+############################
 
 build/modes.o: src/modes.f90
 	$(GF) -c -o $@ src/modes.f90  
 
 build/Modules.o: src/Modules.f90
-	$(GF) -c -o $@ src/Modules.f90 -O3 -g
+	$(GF) -c -o $@ src/Modules.f90  -g
 
 build/Modules_release.o: build/Modules.o src/Modules_release.f90
-	$(GF) -c -o $@ src/Modules_release.f90 -O3 -g
+	$(GF) -c -o $@ src/Modules_release.f90  -g
 
 build/delta_kr.o: src/delta_kr.f90
-	$(GF) -c -o $@ src/delta_kr.f90 -O3 -g
+	$(GF) -c -o $@ src/delta_kr.f90  -g
 
 build/Floquet.o: build/Modules.o build/modes.o src/Floquet_init.f90
-	$(GF) -c -o $@ src/Floquet_init.f90 -O3 -g
+	$(GF) -c -o $@ src/Floquet_init.f90  -g
 
 build/I_and_J_representations.o: src/I_and_J_representations.f90
-	$(GF) -c  -o $@ src/I_and_J_representations.f90 -O3 -g
+	$(GF) -c  -o $@ src/I_and_J_representations.f90  -g
 
 build/F_representation.o: src/F_representation.f90
-	$(GF) -c  -o $@ src/F_representation.f90 -O3
+	$(GF) -c  -o $@ src/F_representation.f90 
 
 build/LapackEigenValues.o:src/LapackEigenValues.f90
-	$(GF) -c -o $@ src/LapackEigenValues.f90 -O3 -g
+	$(GF) -c -o $@ src/LapackEigenValues.f90  -g
 
 build/MKLSparseEigenValues.o:src/MKLSparseEigenvalues.f90
-	$(GF) -c -o $@ src/MKLSparseEigenvalues.f90 -O3 -g
+	$(GF) -c -o $@ src/MKLSparseEigenvalues.f90  -g
 
 build/util.o: src/util.f90
-	$(GF) -c -o $@ src/util.f90 -O3 -g
+	$(GF) -c -o $@ src/util.f90  -g
 
 build/quick-sort-index-table.o: src/quick-sort-index-table.f90
-	$(GF) -o $@ -c src/quick-sort-index-table.f90 -O3 -g
+	$(GF) -o $@ -c src/quick-sort-index-table.f90  -g
 
 build/VarCRSPacking.o: src/VarCRSPacking.f90
-	$(GF) -o $@ -c src/VarCRSPacking.f90 -O3 -g
+	$(GF) -o $@ -c src/VarCRSPacking.f90  -g
 
 build/sparse_utils.o:src/sparse_utils.f90
-	$(GF) -o $@ -c src/sparse_utils.f90 -O3 -g
+	$(GF) -o $@ -c src/sparse_utils.f90  -g
 
 build/MultimodeHamiltonian_SP.o:src/MultimodeHamiltonian_SP.f90
-	$(GF) -o $@ -c src/MultimodeHamiltonian_SP.f90 -O3 -g
+	$(GF) -o $@ -c src/MultimodeHamiltonian_SP.f90  -g
 
 build/MultimodeHamiltonian.o:src/MultimodeHamiltonian.f90
-	$(GF) -o $@ -c src/MultimodeHamiltonian.f90 -O3 -g
+	$(GF) -o $@ -c src/MultimodeHamiltonian.f90 -g
 
 build/MultimodeFloquetTE.o: build/MultimodeHamiltonian.o src/MultimodeFloquetTE.f90
-	$(GF) -o $@ -c build/MultimodeHamiltonian.o src/MultimodeFloquetTE.f90 -O3 -g
+	$(GF) -o $@ -c build/MultimodeHamiltonian.o src/MultimodeFloquetTE.f90 -g
 
 build/MultimodeFloquetTE_DRIVER.o: build/MultimodeHamiltonian.o src/MultimodeFloquetTE_DRIVER.f90
-	$(GF) -o $@ -c build/MultimodeHamiltonian.o src/MultimodeFloquetTE_DRIVER.f90 -O3 -g
+	$(GF) -o $@ -c build/MultimodeHamiltonian.o src/MultimodeFloquetTE_DRIVER.f90  -g
 
 build/MultimodeMicroMotion.o:src/MultimodeMicroMotion.f90
-	$(GF) -o $@ -c src/MultimodeMicroMotion.f90 -O3 -g
+	$(GF) -o $@ -c src/MultimodeMicroMotion.f90  -g
 
 build/MultimodeTransitionAVG.o:src/MultimodeTransitionAVG.f90
-	$(GF) -o $@ -c src/MultimodeTransitionAVG.f90 -O3 -g
+	$(GF) -o $@ -c src/MultimodeTransitionAVG.f90  -g
 
 build/MultimodeDressedBasis.o:src/MultimodeDressedBasis.f90
-	$(GF) -o $@ -c src/MultimodeDressedBasis.f90 -O3 -g
+	$(GF) -o $@ -c src/MultimodeDressedBasis.f90 -g
 
 build/MultimodeDressedBasis_SP.o:src/MultimodeDressedBasis_SP.f90
-	$(GF) -o $@ -c src/MultimodeDressedBasis_SP.f90 -O3 -g
-	
+	$(GF) -o $@ -c src/MultimodeDressedBasis_SP.f90  -g
+
 build/MultimodeFloquet.o:src/MultimodeFloquet.f90
-	$(GF) -o $@ -c src/MultimodeFloquet.f90 -O3 -g
+	$(GF) -o $@ -c src/MultimodeFloquet.f90  -g
+
+
+
+#build/modes.o
+#build/Modules.o
+#build/Modules_release.o
+#build/delta_kr.o
+#build/Floquet.o
+#build/I_and_J_representations.o
+#build/F_representation.o
+#build/LapackEigenValues.o
+#build/MKLSparseEigenValues.o
+#build/util.o
+#build/quick-sort-index-table.o
+#build/VarCRSPacking.o
+#build/sparse_utils.o
+#build/MultimodeHamiltonian_SP.o
+#build/MultimodeHamiltonian.o
+#build/MultimodeFloquetTE.o
+#build/MultimodeFloquetTE_DRIVER.o
+#build/MultimodeMicroMotion.o
+#build/MultimodeTransitionAVG.o
+#build/MultimodeDressedBasis.o
+#build/MultimodeDressedBasis_SP.o
+#build/MultimodeFloquet.o
+
+############################
+# CLEAN
+############################
 
 clean:
-	rm build/*.o ./*mod build/Multi*
+	rm build/*.o ./*mod build/MultimodeFloquet*
