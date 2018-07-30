@@ -95,7 +95,7 @@ PROGRAM MULTIMODEFLOQUET
   FIELDS(5)%phi_y = 0.0
   FIELDS(5)%phi_z = 0.0
   FIELDS(5)%omega = 20.0
-  FIELDS(5)%N_Floquet = 1
+  FIELDS(5)%N_Floquet = 2
 
 
   DO m=1,1!128
