@@ -19,12 +19,12 @@ SUBROUTINE MULTIMODEFLOQUETMATRIX_C(ATOM__C,NM,NF,MODES_NUM,FIELD_C,INFO)
   TYPE(MODE_C), DIMENSION(NF), INTENT(IN)    :: FIELD_C
   TYPE(ATOM_C),                INTENT(IN)    :: ATOM__C                     
 
-  write(*,*) "C WRAPPER:", info,NM,NF,MODES_NUM
+!  write(*,*) "C WRAPPER:", info,NM,NF,MODES_NUM
   IF (INFO.EQ.0) THEN
-     write(*,*) "C wrapper"
+ !    write(*,*) "C wrapper"
      if(info.eq.0) CALL MULTIMODEFLOQUETMATRIX(ATOM_,NM,NF,MODES_NUM,COUPLING,INFO)
      H_FLOQUET_SIZE = SIZE(H_FLOQUET,1)
-     write(*,*) "C wrapper"
+!     write(*,*) "C wrapper"
      !write(*,*) h_floquet_size,size(H_floquet,1),coupling(1)%V(1,1)!, atom_%d_bare,h_floquet(1,1)
      !CALL WRITE_MATRIX(H_FLOQUET)
   ELSE

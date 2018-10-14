@@ -1,3 +1,4 @@
+!export LD_LIBRARY_PATH="/opt/intel/compilers_and_libraries_2017/linux/mkl/lib/intel64"; 
 PROGRAM MULTIMODEFLOQUET
 
   USE ATOMIC_PROPERTIES
@@ -88,6 +89,12 @@ PROGRAM MULTIMODEFLOQUET
   FIELDS(3)%phi_z     = 0.0
   FIELDS(3)%omega     = FIELDS(2)%X/2.0
   FIELDS(3)%N_Floquet = 3
+
+  DO m=1,TOTAL_FREQUENCIES    
+     FIELDS(m)%X = FIELDS(m)%X*exp(DCMPLX(0.0,1.0)*FIELDS(m)%phi_x)
+     FIELDS(m)%Y = FIELDS(m)%Y*exp(DCMPLX(0.0,1.0)*FIELDS(m)%phi_y)
+     FIELDS(m)%Z = FIELDS(m)%Z*exp(DCMPLX(0.0,1.0)*FIELDS(m)%phi_z)
+  END DO
 
   D_MULTIFLOQUET = ID%D_BARE
   DO r=1,TOTAL_FREQUENCIES

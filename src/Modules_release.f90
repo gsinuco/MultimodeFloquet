@@ -74,6 +74,11 @@ MODULE ATOMIC_PROPERTIES
   INTEGER          :: Fdown_spin   =  1
   CHARACTER(LEN=7) :: ID_name_spin = "spin"
 
+
+  !lattice
+  CHARACTER        :: PERIODIC      
+  CHARACTER(LEN=7) :: ID_name_lattice = "lattice"
+
   !6Li  !DOUBLE PRECISION, PARAMETER :: I=1.0  
   !DOUBLE PRECISION, PARAMETER :: g_J = 2.0023010
   !DOUBLE PRECISION, PARAMETER :: g_I = -0.0004476540

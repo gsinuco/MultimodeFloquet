@@ -10,17 +10,29 @@
         <df name="CPP">
           <in>MultimodeFloquet.h</in>
           <in>main_DressedQubit.cpp</in>
-          <in>main_DressedQubit_sp.cpp</in>
+          <in>main_DressedQubit_SP.cpp</in>
           <in>main_qubit.cpp</in>
           <in>main_qubit_sp.cpp</in>
           <in>main_release.cpp</in>
         </df>
         <df name="FORTRAN">
+          <in>main_87Rb_RFMW_DRIVER.f90</in>
+          <in>main_87Rb_RF_DRIVER.f90</in>
           <in>main_DressedQubit.f90</in>
+          <in>main_DressedQubit_DRIVER.f90</in>
           <in>main_DressedQubit_SP.f90</in>
+          <in>main_Lattice.f90</in>
+          <in>main_QuantumInterference.f90</in>
           <in>main_Release.f90</in>
           <in>main_qubit.f90</in>
+          <in>main_qubitLattice.f90</in>
+          <in>main_qubitLattice_DRIVER.f90</in>
+          <in>main_qubitLattice_SP.f90</in>
+          <in>main_qubit_DRIVER.f90</in>
           <in>main_qubit_SP.f90</in>
+          <in>main_qubit_Shirley.f90</in>
+          <in>main_qubit_noise_SP.f90</in>
+          <in>main_spin_DRIVER.f90</in>
           <in>newfile.cpp</in>
         </df>
       </df>
@@ -76,6 +88,7 @@
         <in>MultimodeMicroMotion_C.f90</in>
         <in>MultimodeTransitionAVG.f90</in>
         <in>MultimodeTransitionAVG_C.f90</in>
+        <in>Runge-Kutta4thorder.f90</in>
         <in>VarCRSPacking.f90</in>
         <in>delta_kr.f90</in>
         <in>main_DressedQubit.cpp</in>
@@ -96,14 +109,19 @@
         <in>util.f90</in>
         <in>util_c.f90</in>
       </df>
+      <in>arrays.mod</in>
       <in>atomic_properties.mod</in>
+      <in>feast.mod</in>
+      <in>floquetinit_.mod</in>
       <in>funciones.mod</in>
       <in>mergingarrays.mod</in>
       <in>mergingarrays_c.mod</in>
       <in>modes_4f.mod</in>
+      <in>physical_constants.mod</in>
       <in>sparse_interface.mod</in>
       <in>subinterface.mod</in>
       <in>subinterface_lapack.mod</in>
+      <in>types.mod</in>
       <in>types_c.mod</in>
     </df>
   </logicalFolder>

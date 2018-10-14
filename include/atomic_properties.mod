@@ -1,5 +1,5 @@
 GFORTRAN module version '10' created from src/Modules_release.f90
-MD5:05e1e609fbb09e6cd6ee5951cb0f0ea1 -- If you edit this, you'll get what you deserve.
+MD5:7cc4adb6711db1717526dffdfc6a105e -- If you edit this, you'll get what you deserve.
 
 (() () () () () () () () () () () () () () () () () () () () () () ()
 () () () ())
@@ -199,74 +199,80 @@ CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '7'))) 0 0 () () 0 () () () 0 0)
 61 'id_name_87rb' 'atomic_properties' '' 1 ((VARIABLE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((
 CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '7'))) 0 0 () () 0 () () () 0 0)
-62 'id_name_qubit' 'atomic_properties' '' 1 ((VARIABLE UNKNOWN-INTENT
+62 'id_name_lattice' 'atomic_properties' '' 1 ((VARIABLE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((
 CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '7'))) 0 0 () () 0 () () () 0 0)
-63 'id_name_spin' 'atomic_properties' '' 1 ((VARIABLE UNKNOWN-INTENT
+63 'id_name_qubit' 'atomic_properties' '' 1 ((VARIABLE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((
 CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '7'))) 0 0 () () 0 () () () 0 0)
-64 'j' 'atomic_properties' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+64 'id_name_spin' 'atomic_properties' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((
+CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '7'))) 0 0 () () 0 () () () 0 0)
+65 'j' 'atomic_properties' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () () 0 () () () 0
 0)
-65 'j_6li' 'atomic_properties' '' 1 ((VARIABLE UNKNOWN-INTENT
+66 'j_6li' 'atomic_properties' '' 1 ((VARIABLE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () ()
 0 () () () 0 0)
-66 'j_87rb' 'atomic_properties' '' 1 ((VARIABLE UNKNOWN-INTENT
+67 'j_87rb' 'atomic_properties' '' 1 ((VARIABLE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () ()
 0 () () () 0 0)
-67 'j_imag' 'physical_constants' '' 1 ((PARAMETER UNKNOWN-INTENT
+68 'j_imag' 'physical_constants' '' 1 ((PARAMETER UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (COMPLEX 8 0 0 0 COMPLEX ()) 0 0
 () (CONSTANT (COMPLEX 8 0 0 0 COMPLEX ()) 0 '0.00000000000000@0'
 '0.10000000000000@1') () 0 () () () 0 0)
-68 'j_qubit' 'atomic_properties' '' 1 ((VARIABLE UNKNOWN-INTENT
+69 'j_qubit' 'atomic_properties' '' 1 ((VARIABLE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () ()
 0 () () () 0 0)
-69 'j_spin' 'atomic_properties' '' 1 ((VARIABLE UNKNOWN-INTENT
+70 'j_spin' 'atomic_properties' '' 1 ((VARIABLE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () ()
 0 () () () 0 0)
-70 'k_b' 'physical_constants' '' 1 ((PARAMETER UNKNOWN-INTENT
+71 'k_b' 'physical_constants' '' 1 ((PARAMETER UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () (
 CONSTANT (REAL 8 0 0 0 REAL ()) 0 '0.10b0e6a0000000@-18') () 0 () () ()
 0 0)
-71 'l' 'atomic_properties' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+72 'l' 'atomic_properties' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () () 0 () () () 0
 0)
-72 'mass_at' 'atomic_properties' '' 1 ((VARIABLE UNKNOWN-INTENT
+73 'mass_at' 'atomic_properties' '' 1 ((VARIABLE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () ()
 0 () () () 0 0)
-73 'mf' 'atomic_properties' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+74 'mf' 'atomic_properties' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () () 0 () () () 0
 0)
-74 'mu_b' 'physical_constants' '' 1 ((PARAMETER UNKNOWN-INTENT
+75 'mu_b' 'physical_constants' '' 1 ((PARAMETER UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () (
 CONSTANT (REAL 8 0 0 0 REAL ()) 0 '0.b362ac00000000@-19') () 0 () () ()
 0 0)
-75 'mu_cero' 'physical_constants' '' 1 ((PARAMETER UNKNOWN-INTENT
+76 'mu_cero' 'physical_constants' '' 1 ((PARAMETER UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () (
 CONSTANT (REAL 8 0 0 0 REAL ()) 0 '0.15153700000000@-4') () 0 () () () 0
 0)
-76 'physical_constants' 'physical_constants' '' 1 ((MODULE
+77 'periodic' 'atomic_properties' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((
+CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1'))) 0 0 () () 0 () () () 0 0)
+78 'physical_constants' 'physical_constants' '' 1 ((MODULE
 UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) (UNKNOWN 0 0 0 0
 UNKNOWN ()) 0 0 () () 0 () () () 0 0)
-77 'pi' 'physical_constants' '' 1 ((PARAMETER UNKNOWN-INTENT
+79 'pi' 'physical_constants' '' 1 ((PARAMETER UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () (
 CONSTANT (REAL 8 0 0 0 REAL ()) 0 '0.3243f6c0000000@1') () 0 () () () 0
 0)
-78 's' 'atomic_properties' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+80 's' 'atomic_properties' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () () 0 () () () 0
 0)
-79 'sb_ct' 'physical_constants' '' 1 ((PARAMETER UNKNOWN-INTENT
+81 'sb_ct' 'physical_constants' '' 1 ((PARAMETER UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () (
 CONSTANT (REAL 8 0 0 0 REAL ()) 0 '0.f38ab500000000@-6') () 0 () () () 0
 0)
-80 'speedoflight' 'physical_constants' '' 1 ((PARAMETER UNKNOWN-INTENT
+82 'speedoflight' 'physical_constants' '' 1 ((PARAMETER UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () (
 CONSTANT (REAL 8 0 0 0 REAL ()) 0 '0.11de7840000000@8') () 0 () () () 0
 0)
-81 'total_states_lsi' 'atomic_properties' '' 1 ((VARIABLE UNKNOWN-INTENT
+83 'total_states_lsi' 'atomic_properties' '' 1 ((VARIABLE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0
 () () 0 () () () 0 0)
-82 'total_time' 'physical_constants' '' 1 ((VARIABLE UNKNOWN-INTENT
+84 'total_time' 'physical_constants' '' 1 ((VARIABLE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () ()
 0 () () () 0 0)
 )
@@ -283,8 +289,9 @@ UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () ()
 'gi_87rb' 0 45 'gi_qubit' 0 46 'gi_spin' 0 47 'gj_6li' 0 48 'gj_87rb' 0
 49 'gj_qubit' 0 50 'gj_spin' 0 51 'h_p' 0 52 'hbar' 0 53 'i' 0 54 'i_6li'
 0 55 'i_87rb' 0 56 'i_qubit' 0 57 'i_spin' 0 58 'id_name' 0 59
-'id_name_6li' 0 60 'id_name_87rb' 0 61 'id_name_qubit' 0 62 'id_name_spin'
-0 63 'j' 0 64 'j_6li' 0 65 'j_87rb' 0 66 'j_imag' 0 67 'j_qubit' 0 68
-'j_spin' 0 69 'k_b' 0 70 'l' 0 71 'mass_at' 0 72 'mf' 0 73 'mu_b' 0 74
-'mu_cero' 0 75 'physical_constants' 0 76 'pi' 0 77 's' 0 78 'sb_ct' 0 79
-'speedoflight' 0 80 'total_states_lsi' 0 81 'total_time' 0 82)
+'id_name_6li' 0 60 'id_name_87rb' 0 61 'id_name_lattice' 0 62
+'id_name_qubit' 0 63 'id_name_spin' 0 64 'j' 0 65 'j_6li' 0 66 'j_87rb'
+0 67 'j_imag' 0 68 'j_qubit' 0 69 'j_spin' 0 70 'k_b' 0 71 'l' 0 72
+'mass_at' 0 73 'mf' 0 74 'mu_b' 0 75 'mu_cero' 0 76 'periodic' 0 77
+'physical_constants' 0 78 'pi' 0 79 's' 0 80 'sb_ct' 0 81 'speedoflight'
+0 82 'total_states_lsi' 0 83 'total_time' 0 84)

@@ -30,17 +30,25 @@ all: Example_lib_f Example_lib_f_sp
 
 
 
-Example_lib_f: main_qubit.f90 main_DressedQubit.f90
-	$(GF) -o qubit         main_qubit.f90        -I$(MMFINC) -L$(MMFLIB) -lmultimodefloquet  $(GFFLAGS) 
-	$(GF) -o qubit_driver  main_qubit_DRIVER.f90 -I$(MMFINC) -L$(MMFLIB) -lmultimodefloquet  $(GFFLAGS) 
-	$(GF) -o spin_driver   main_spin_DRIVER.f90 -I$(MMFINC) -L$(MMFLIB) -lmultimodefloquet  $(GFFLAGS) 
-	$(GF) -o dressedqubit  main_DressedQubit.f90 -I$(MMFINC) -L$(MMFLIB) -lmultimodefloquet  $(GFFLAGS) 
+Example_lib_f: main_qubit.f90 main_qubit_DRIVER.f90 main_spin_DRIVER.f90 main_DressedQubit.f90 main_DressedQubit_DRIVER.f90 main_87Rb_RFMW_DRIVER.f90 main_qubitLattice_DRIVER.f90 main_QuantumInterference.f90 main_qubit_Shirley.f90 
+#main_Lattice.f90
+	$(GF) -o qubit                main_qubit.f90        -I$(MMFINC) -L$(MMFLIB) -lmultimodefloquet  $(GFFLAGS) 
+	$(GF) -o qubit_driver         main_qubit_DRIVER.f90 -I$(MMFINC) -L$(MMFLIB) -lmultimodefloquet  $(GFFLAGS) 
+	$(GF) -o spin_driver          main_spin_DRIVER.f90 -I$(MMFINC) -L$(MMFLIB) -lmultimodefloquet  $(GFFLAGS) 
+	$(GF) -o dressedqubit         main_DressedQubit.f90 -I$(MMFINC) -L$(MMFLIB) -lmultimodefloquet  $(GFFLAGS) 
 	$(GF) -o dressedqubit_DRIVER  main_DressedQubit_DRIVER.f90 -I$(MMFINC) -L$(MMFLIB) -lmultimodefloquet  $(GFFLAGS) 
 	$(GF) -o dressedRb87_DRIVER   main_87Rb_RFMW_DRIVER.f90 -I$(MMFINC) -L$(MMFLIB) -lmultimodefloquet  $(GFFLAGS) 
+	$(GF) -o qubitL_driver        main_qubitLattice_DRIVER.f90 -I$(MMFINC) -L$(MMFLIB) -lmultimodefloquet  $(GFFLAGS) 
+	$(GF) -o qubitL               main_qubitLattice.f90 -I$(MMFINC) -L$(MMFLIB) -lmultimodefloquet  $(GFFLAGS) 
+	$(GF) -o twophoton            main_QuantumInterference.f90 -I$(MMFINC) -L$(MMFLIB) -lmultimodefloquet  $(GFFLAGS) 
+	$(GF) -o qubit_shirley        main_qubit_Shirley.f90 -I$(MMFINC) -L$(MMFLIB) -lmultimodefloquet  $(GFFLAGS) 
+	$(GF) -o shakenlattice        main_Lattice.f90 -I$(MMFINC) -L$(MMFLIB) -lmultimodefloquet  $(GFFLAGS) 
 
-Example_lib_f_sp: main_qubit_SP.f90 main_DressedQubit_SP.f90
-	$(GF) -o  qubit_sp          main_qubit_SP.f90        -I$(MMFINC) -L$(MMFLIB) -lmultimodefloquet -L$(MKLLIBS) -I$(MKLINC) $(GFFLAGS_SP) $(MKLFLAGS)
-	$(GF) -o  dressedqubit_sp   main_DressedQubit_SP.f90 -I$(MMFINC) -L$(MMFLIB) -lmultimodefloquet -L$(MKLLIBS) -I$(MKLINC) $(GFFLAGS_SP) $(MKLFLAGS)
+Example_lib_f_sp: main_qubit_SP.f90 main_DressedQubit_SP.f90  main_qubitLattice_SP.f90  main_qubit_noise_SP.f90
+	$(GF) -o  qubit_sp        main_qubit_SP.f90        -I$(MMFINC) -L$(MMFLIB) -lmultimodefloquet -L$(MKLLIBS) -I$(MKLINC) $(GFFLAGS_SP) $(MKLFLAGS)
+	$(GF) -o  dressedqubit_sp main_DressedQubit_SP.f90 -I$(MMFINC) -L$(MMFLIB) -lmultimodefloquet -L$(MKLLIBS) -I$(MKLINC) $(GFFLAGS_SP) $(MKLFLAGS)
+	$(GF) -o qubitL_SP        main_qubitLattice_SP.f90 -I$(MMFINC) -L$(MMFLIB) -lmultimodefloquet -L$(MKLLIBS) -I$(MKLINC) $(GFFLAGS_SP) $(MKLFLAGS)
+	$(GF) -o qubit_noise_SP   main_qubit_noise_SP.f90  -I$(MMFINC) -L$(MMFLIB) -lmultimodefloquet -L$(MKLLIBS) -I$(MKLINC) $(GFFLAGS_SP) $(MKLFLAGS)
 
 
 ############################
@@ -48,5 +56,5 @@ Example_lib_f_sp: main_qubit_SP.f90 main_DressedQubit_SP.f90
 ############################
 
 clean:
-	rm qubit dressedqubit qubit_sp dressedqubit_sp dressedRb87_DRIVER spin_driver dressedqubit_DRIVER qubit_driver
+	rm qubit dressedqubit qubit_sp dressedqubit_sp dressedRb87_DRIVER spin_driver dressedqubit_DRIVER qubit_driver lattice qubitL qubitL_driver qubitL_SP qubit_noise_SP qubit_shirley shakenlattice twophoton
 

@@ -71,8 +71,7 @@
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <flagsDictionary>
-        <element flagsID="0" commonFlags="-O3"/>
-        <element flagsID="1" commonFlags="-m64 -O3"/>
+        <element flagsID="0" commonFlags="-m64"/>
       </flagsDictionary>
       <codeAssistance>
       </codeAssistance>
@@ -81,7 +80,7 @@
           <buildCommandWorkingDir>.</buildCommandWorkingDir>
           <buildCommand>${MAKE} -f Makefile</buildCommand>
           <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
-          <executablePath></executablePath>
+          <executablePath>build/MultimodeFloquetDressedQubit_SP_C</executablePath>
         </makeTool>
         <preBuild>
           <preBuildCommandWorkingDir>.</preBuildCommandWorkingDir>
@@ -143,7 +142,7 @@
       <item path="src/delta_kr.f90" ex="false" tool="2" flavor2="0">
       </item>
       <item path="src/main_DressedQubit.cpp" ex="false" tool="1" flavor2="4">
-        <ccTool flags="0">
+        <ccTool>
           <incDir>
             <pElem>.</pElem>
           </incDir>
@@ -152,7 +151,7 @@
       <item path="src/main_DressedQubit.f90" ex="false" tool="2" flavor2="0">
       </item>
       <item path="src/main_DressedQubit_SP.cpp" ex="false" tool="1" flavor2="0">
-        <ccTool flags="1">
+        <ccTool flags="0">
           <incDir>
             <pElem>/opt/intel/compilers_and_libraries/linux/mkl/include</pElem>
             <pElem>.</pElem>
@@ -162,7 +161,7 @@
       <item path="src/main_DressedQubit_SP.f90" ex="false" tool="2" flavor2="0">
       </item>
       <item path="src/main_qubit.cpp" ex="false" tool="1" flavor2="4">
-        <ccTool flags="0">
+        <ccTool>
           <incDir>
             <pElem>.</pElem>
           </incDir>
@@ -173,7 +172,7 @@
       <item path="src/main_qubit_SP.f90" ex="false" tool="2" flavor2="0">
       </item>
       <item path="src/main_qubit_sp.cpp" ex="false" tool="1" flavor2="4">
-        <ccTool flags="1">
+        <ccTool flags="0">
           <incDir>
             <pElem>/opt/intel/compilers_and_libraries/linux/mkl/include</pElem>
             <pElem>.</pElem>

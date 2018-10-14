@@ -96,7 +96,7 @@ int main(){
   fields[4].omega = 20.0;
   fields[4].N_Floquet = 1;
 
-  printf("%i %i \n",d_bare,total_frequencies);
+  //printf("%i %i \n",d_bare,total_frequencies);
 
   for(m=1;m<2;m++){
     
@@ -105,11 +105,16 @@ int main(){
     sethamiltoniancomponents_c_(&id,&nm,&total_frequencies,modes_num,fields,&info);
     
     //!--- FIND THE MULTIMODE FLOQUET SPECTRUM 
+    
+
+
+    
+
     multimodefloquetmatrix_c_(&id,&nm,&total_frequencies,modes_num,fields,&info); // in this function we calculate the dimension of the multimode floquet hilbert space, 
                                                                                   // which is the value of the global variable h_floquet_size
     
+
     double * e_floquet = new double [h_floquet_size];
-    
     dcmplx * U_F =  new dcmplx [h_floquet_size*h_floquet_size];
     
     lapack_fulleigenvalues_c_(U_F,&h_floquet_size,e_floquet,&info);// here, the diagonalization is done with the internal (Fortran) Hamiltonian (H_FLOQUET)
@@ -117,8 +122,9 @@ int main(){
                                                                    // On the Fortran side, H_FLOQUET is deallocated after diagonalization. This is needed since
                                                                    // because the floquet hamiltonian is allocated again when running the subroutine
                                                                    // MULTIMODEFLOQUETMATRIX 
-    for(r=0;r<h_floquet_size;r++) printf("%15.5f  ",e_floquet[r]);
+    //for(r=0;r<h_floquet_size;r++) printf("%15.5f  ",e_floquet[r]);
     //--- EVALUATE THE AVERAGE TRANSITION PROBATILIBIES IN THE BARE BASIS
+
     double * p_avg =  new double [h_floquet_size*h_floquet_size];
     multimodetransitionavg_c_(&h_floquet_size,&nm,fields,modes_num,U_F,e_floquet,&d_bare,p_avg,&info);
     
@@ -128,10 +134,10 @@ int main(){
     t1 = 0.0;
     multimodefloquettransformation_c_(&h_floquet_size,&nm,modes_num,U_F,e_floquet,&d_bare,fields,&t1,U_B2D,&info); 
     for(l=0;l<d_bare*h_floquet_size;l++) P_B2D[l] = pow(abs(U_B2D[l]),2);
-    printf("\n %i \n",d_bare*h_floquet_size);
     
-    l = d_bare*h_floquet_size;
-    rec_write_matrix_c_(P_B2D,&d_bare,&h_floquet_size);      
+    // printf("\n %i \n",d_bare*h_floquet_size);
+    //l = d_bare*h_floquet_size;
+    //rec_write_matrix_c_(P_B2D,&d_bare,&h_floquet_size);      
     
     
     
@@ -146,6 +152,7 @@ int main(){
     }
     delete(e_floquet);    
     delete(U_F);
+
   }
   
   return 0;

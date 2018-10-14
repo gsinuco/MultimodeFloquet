@@ -126,6 +126,8 @@ SUBROUTINE LAPACK_FULLEIGENVALUES(H,N,W_SPACE,INFO)
   UPLO = 'L'  
 
   write(*,*) "# call to lapack diagonalization of a matrix of size",N
+!  write(*,*) H
+
   ALLOCATE(H_AUX_(N,N))
   H_AUX_ = 0.0
   LDA   =  N
@@ -149,7 +151,6 @@ SUBROUTINE LAPACK_FULLEIGENVALUES(H,N,W_SPACE,INFO)
 
   CALL ZHEEV(JOBZ,UPLO,N,H,LDA,W_SPACE, WORK, LWORK, RWORK,INFO)       
   !IF(INFO /= 0) WRITE(*,*) "# DIAG FAIL 1",INFO
-  
   DEALLOCATE(WORK)
   DEALLOCATE(RWORK) 
   DEALLOCATE(H_AUX_)

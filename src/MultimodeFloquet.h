@@ -42,10 +42,10 @@ extern "C" {
     
   // DEFINITION OF DRESSED BASIS
   void            dressedbasis_c_(int * h_floquet_size,atom_c *id,int * nm, int * modes_num,mode_c * fields, dcmplx * U_FD, double * e_dressed,int * info); 
-  void     dressedbasis_subset_c_(atom_c *id, int * dressingfloquetdimension,int * dressingields, int * nm, int * dressingfields_indices, int * modes_num,mode_c * fields, dcmplx * U_FD, double * e_dressed,int * info);
+  void     dressedbasis_subset_c_(atom_c *id , int * dressingfloquetdimension,int * dressingfields, int * nm, int * dressingfields_indices, int * modes_num,mode_c * fields, dcmplx * U_FD, double * e_dressed,int * info);
+  void  dressedbasis_subset_sp_c_(atom_c * id, int * dressingfloquetdimension,int * dressingfields,int * nm, int * dressingfields_indices, int * modes_num,mode_c * fields, dcmplx * U_FD, double * e_dressed,int * info);
   void         dressedbasis_sp_c_(int h_floquet_size, atom_c *id, int * nm, int * modes_num, mode_c * fields, dcmplx * U_FD, double * e_dressed, int * info);
-  void  dressedbasis_subset_sp_c_(atom_c * id, int * dressingfloquetdimension,int * dressingfields,int * nm,int * dressingfields_indices, int * modes_num,mode_c * fields, dcmplx * U_FD, double * e_dressed,int * info);
-
+  
   
   // UTILITY FUNCTION: EXTRACT GLOBAL VARIABLES WITH SCOPE ONLY WITHIN FORTRAN
   //                   H_FLOQUET : MULTIMODE FLOQUET HAMILTONIAN

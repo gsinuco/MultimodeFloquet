@@ -1,3 +1,5 @@
+//export LD_LIBRARY_PATH="/opt/intel/compilers_and_libraries_2017/linux/mkl/lib/intel64"; 
+
 #include <iostream>
 #include <complex>
 #include <stdio.h>
@@ -96,7 +98,7 @@ int main(){
   fields[4].omega = 20.0;
   fields[4].N_Floquet = 1;
 
-  printf("%i %i \n",d_bare,total_frequencies);
+  //printf("%i %i \n",d_bare,total_frequencies);
 
   for(m=1;m<2;m++){
     
@@ -114,14 +116,14 @@ int main(){
     
     e_l = -40.0;
     e_r =  40.0;
-    
-    
+        
     double * e_floquet = new double [h_floquet_size];
     dcmplx * U_F =  new dcmplx [h_floquet_size*h_floquet_size];
    
     mklsparse_fulleigenvalues_c_(&h_floquet_size,&e_l,&e_r,e_floquet,U_F,&info);
-    printf("info = %i, h_floquet_size = %i\n", info,h_floquet_size);
-    for(r=0;r<h_floquet_size;r++) printf("%15.5f  ",e_floquet[r]);
+    //printf("info = %i, h_floquet_size = %i\n", info,h_floquet_size);
+    //for(r=0;r<h_floquet_size;r++) printf("%15.5f  ",e_floquet[r]);
+
 
 
     //--- EVALUATE THE AVERAGE TRANSITION PROBATILIBIES IN THE BARE BASIS
@@ -135,10 +137,10 @@ int main(){
     t1 = 0.0;
     multimodefloquettransformation_c_(&h_floquet_size,&nm,modes_num,U_F,e_floquet,&d_bare,fields,&t1,U_B2D,&info); 
     for(l=0;l<d_bare*h_floquet_size;l++) P_B2D[l] = pow(abs(U_B2D[l]),2);
-    printf("\n %i \n",d_bare*h_floquet_size);
-    
-    l = d_bare*h_floquet_size;
-    rec_write_matrix_c_(P_B2D,&d_bare,&h_floquet_size);      
+
+    //printf("\n %i \n",d_bare*h_floquet_size);
+    //l = d_bare*h_floquet_size;
+    //rec_write_matrix_c_(P_B2D,&d_bare,&h_floquet_size);      
     
     
     

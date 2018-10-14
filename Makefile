@@ -40,6 +40,21 @@ lib:build/modes.o build/Modules.o build/Modules_release.o build/delta_kr.o build
 	$(RANLIB) lib/libmultimodefloquet.a
 	cp *.mod ./include/
 
+lib_lapack :build/modes.o build/Modules.o build/Modules_release.o build/delta_kr.o build/Floquet.o \
+ build/I_and_J_representations.o build/F_representation.o build/LapackEigenValues.o \
+ build/util.o build/quick-sort-index-table.o build/VarCRSPacking.o \
+ build/sparse_utils.o build/MultimodeHamiltonian.o \
+ build/MultimodeFloquetTE.o build/MultimodeFloquetTE_DRIVER.o build/MultimodeMicroMotion.o \
+ build/MultimodeTransitionAVG.o build/MultimodeDressedBasis.o \
+ build/util_c.o build/modes_C.o build/Floquet_init_C.o \
+ build/MultimodeHamiltonian_C.o build/LapackEigenValues_C.o build/MultimodeTransitionAVG_C.o \
+ build/MultimodeMicroMotion_C.o build/MultimodeFloquetTE_DRIVER_C.o build/MultimodeFloquetTE_C.o \
+ build/MultimodeDressedBasis_C.o  build/MKLSparseEigenValues_C.o 
+	$(AR) -urv lib/libmultimodefloquet.a build/*.o
+	$(RANLIB) lib/libmultimodefloquet.a
+	cp *.mod ./include/
+
+
 Example_lib: ./examples/FORTRAN/main_qubit.f90  ./examples/FORTRAN/main_DressedQubit.f90
 	$(GF) -o ./examples/FORTRAN/qubit  ./examples/FORTRAN/main_qubit.f90 -I./include/ -L./lib/ -lmultimodefloquet $(GFFLAGS)
 	$(GF) -o ./examples/FORTRAN/dressedqubit  ./examples/FORTRAN/main_DressedQubit.f90 -I./include/ -L./lib/ -lmultimodefloquet $(GFFLAGS)

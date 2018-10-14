@@ -74,7 +74,10 @@ SUBROUTINE SET_ATOMIC_PARAMETERS(ATOMICSPECIE,MANIFOLD,JTOTAL,ID,INFO)
      ID_name = ID_name_spin
 
      write(*,*) "# spin"
-
+  CASE("lattice")
+     INFO    = 5 ! ITS A lattice
+     ID_name = ID_name_lattice
+     
   END SELECT
   
   IF(INFO.EQ.1) THEN
@@ -147,7 +150,12 @@ SUBROUTINE SET_ATOMIC_PARAMETERS(ATOMICSPECIE,MANIFOLD,JTOTAL,ID,INFO)
   ELSE IF(INFO .EQ. 4) THEN
      ! HERE WE DEFINE THE PARAMETES OF THE LATTICE HAMILTONIAN
      ID%id_system = 6     
-     ID_name = " unnamed"
+     ID_name      = "unnamed"
+  ELSE IF(INFO.EQ.5) THEN
+     ID%id_system    = 7
+     ID_name         = "lattice"
+     PERIODIC        =  manifold ! boundary conditionss
+     total_states_lsi = JTOTAL   ! number of sites
   END IF
   ID%D_bare = total_states_lsi
   
@@ -446,7 +454,6 @@ SUBROUTINE SETHAMILTONIANCOMPONENTS(ID,NM,NF,MODES_NUM,FIELD,INFO)
 ! FIELDS : IN AND OUTPUT THE MATRICES
 ! INFO
 
-  !USE FLOQUET
   USE ARRAYS
   USE ATOMIC_PROPERTIES
   USE TYPES
@@ -466,41 +473,35 @@ SUBROUTINE SETHAMILTONIANCOMPONENTS(ID,NM,NF,MODES_NUM,FIELD,INFO)
 
   WRITE(*,*) "# Setting the Hamiltonian components for a ",ID_name
   WRITE(*,*) "# with ",nm, " modes and ",nf," fields"
-  
   TOTAL_FREQUENCIES = NF
+!  write(*,*) "# total frequencies:", total_frequencies,ID%id_system
   SELECT CASE(ID%id_system)
   CASE(3) ! ATOM, BOTH HYPERFINE MANIFOLDS
-     !     ALLOCATE(E_ZEEMAN(ID%D_BARE))
      U_ZEEMAN = 0.0
- !    DO m=1,TOTAL_FREQUENCIES
- !       FIELD(m)%X = FIELD(m)%X*exp(DCMPLX(0.0,1.0)*FIELD(m)%phi_x)
- !       FIELD(m)%Y = FIELD(m)%Y*exp(DCMPLX(0.0,1.0)*FIELD(m)%phi_y)
- !       FIELD(m)%Z = FIELD(m)%Z*exp(DCMPLX(0.0,1.0)*FIELD(m)%phi_z)
- !    END DO
      DO m=1,TOTAL_FREQUENCIES
-!        FIELD(m)%OMEGA = HBAR*FIELD(m)%OMEGA/A        
         IF(m.EQ.1) THEN
            FIELD(m)%V = A*(MATMUL(I_x,J_x) - MATMUL(I_y,J_y) + MATMUL(I_z,J_z)) + &
-                &       mu_B*(g_J*(FIELD(m)%X*J_x  + DCMPLX(0.0,-1.0)*FIELD(m)%Y*J_y + FIELD(m)%Z*J_z) + &
-                &            (g_I*(FIELD(m)%X*I_x  + DCMPLX(0.0,-1.0)*FIELD(m)%Y*I_y + FIELD(m)%Z*I_z)))
+                &       mu_B*(g_J*(FIELD(m)%X*EXP(DCMPLX(0.0,1.0)*FIELD(m)%phi_x)*J_x  + &
+                & DCMPLX(0.0,-1.0)*FIELD(m)%Y*EXP(DCMPLX(0.0,1.0)*FIELD(m)%phi_y)*J_y  + &
+                &                  FIELD(m)%Z*EXP(DCMPLX(0.0,1.0)*FIELD(m)%phi_z)*J_z) + &
+                &            (g_I*(FIELD(m)%X*EXP(DCMPLX(0.0,1.0)*FIELD(m)%phi_x)*I_x  + &
+                & DCMPLX(0.0,-1.0)*FIELD(m)%Y*EXP(DCMPLX(0.0,1.0)*FIELD(m)%phi_y)*I_y  + &
+                &                  FIELD(m)%Z*EXP(DCMPLX(0.0,1.0)*FIELD(m)%phi_z)*I_z)))
            FIELD(m)%V = FIELD(m)%V/A
            U_ZEEMAN = FIELD(m)%V 
-           !CALL WRITE_MATRIX(ABS(U_ZEEMAN))
-           CALL LAPACK_FULLEIGENVALUES(U_ZEEMAN,SIZE(FIELD(m)%V,1),E_ZEEMAN,INFO)
-           !CALL WRITE_MATRIX(ABS(U_ZEEMAN))
-           !WRITE(*,*) E_ZEEMAN
+           CALL LAPACK_FULLEIGENVALUES(U_ZEEMAN,SIZE(FIELD(m)%V,1),E_ZEEMAN,INFO) ! FIND THE BASIS OF ZEEMAN STATES
            FIELD(m)%V = MATMUL(TRANSPOSE(CONJG(U_ZEEMAN)),MATMUL(FIELD(m)%V,U_ZEEMAN))
-           !call write_matrix(abs(field(m)%V))
         END IF
         
         IF(m.GT.1) THEN
-           !write(*,*) field(m)%X,field(m)%Y,field(m)%z,g_J,g_I,mu_B
-           FIELD(m)%V = mu_B*(g_J*(FIELD(m)%X*J_x  + DCMPLX(0.0,-1.0)*FIELD(m)%Y*J_y + FIELD(m)%Z*J_z) + &
-                &            (g_I*(FIELD(m)%X*I_x  + DCMPLX(0.0,-1.0)*FIELD(m)%Y*I_y + FIELD(m)%Z*I_z)))
+           FIELD(m)%V = mu_B*(g_J*(FIELD(m)%X*EXP(DCMPLX(0.0,1.0)*FIELD(m)%phi_x)*J_x  + &
+                & DCMPLX(0.0,-1.0)*FIELD(m)%Y*EXP(DCMPLX(0.0,1.0)*FIELD(m)%phi_y)*J_y  + &
+                &                  FIELD(m)%Z*EXP(DCMPLX(0.0,1.0)*FIELD(m)%phi_z)*J_z) + &
+                &            (g_I*(FIELD(m)%X*EXP(DCMPLX(0.0,1.0)*FIELD(m)%phi_x)*I_x  + &
+                & DCMPLX(0.0,-1.0)*FIELD(m)%Y*EXP(DCMPLX(0.0,1.0)*FIELD(m)%phi_y)*I_y  + &
+                &                  FIELD(m)%Z*EXP(DCMPLX(0.0,1.0)*FIELD(m)%phi_z)*I_z)))
            FIELD(m)%V = FIELD(m)%V/A
-           !call write_matrix(abs(field(m)%V))
-           FIELD(m)%V = MATMUL(TRANSPOSE(CONJG(U_ZEEMAN)),MATMUL(FIELD(m)%V,U_ZEEMAN))
-           !call write_matrix(abs(field(m)%V))
+           FIELD(m)%V = MATMUL(TRANSPOSE(CONJG(U_ZEEMAN)),MATMUL(FIELD(m)%V,U_ZEEMAN))!WRITE THE COUPLINGS IN THE ZEEMAN BASIS
         END IF
      END DO
      
@@ -510,26 +511,32 @@ SUBROUTINE SETHAMILTONIANCOMPONENTS(ID,NM,NF,MODES_NUM,FIELD,INFO)
         KD = KD*(2*N_FLOQUET_+1)
      END DO
      KD = KD + SIZE(U_ZEEMAN,1) - 1
-
      
-  !   DEALLOCATE(E_ZEEMAN)
-  CASE DEFAULT ! ATOM, ON MANIFOLD, QUBIT, SPIN
-!!$     !    ALLOCATE(E_ZEEMAN(ID%D_BARE))
-     !write(*,*)id%d_bare
+  CASE(7) ! ONE DIMENSIONAL TIGHT BINDING LATTICE
+     
+     
+     
+  CASE(8) ! TWO-DIMENSIONAL TIGHT BINDING LATTICE
+     
+  CASE DEFAULT ! ATOM, ONE MANIFOLD, QUBIT, SPIN
+     
      U_ZEEMAN = 0.0
      DO m=1,TOTAL_FREQUENCIES
-        !write(*,*) m,total_frequencies
         IF(m.EQ.1) THEN
-           FIELD(m)%V = (FIELD(m)%X*J_x  + DCMPLX(0.0,-1.0)*FIELD(m)%Y*J_y + FIELD(m)%Z*J_z) 
+           FIELD(m)%V =            (FIELD(m)%X*EXP(DCMPLX(0.0,1.0)*FIELD(m)%phi_x)*J_x  + &
+                &  DCMPLX(0.0,-1.0)*FIELD(m)%Y*EXP(DCMPLX(0.0,1.0)*FIELD(m)%phi_y)*J_y  + &
+                                    FIELD(m)%Z*EXP(DCMPLX(0.0,1.0)*FIELD(m)%phi_z)*J_z) 
            U_ZEEMAN   = FIELD(m)%V 
-           !write(*,*) size(u_zeeman,1),size(e_zeeman,1), SIZE(FIELD(m)%V,1)
            CALL LAPACK_FULLEIGENVALUES(U_ZEEMAN,SIZE(FIELD(m)%V,1),E_ZEEMAN,INFO)
-           !write(*,*) info
         END IF
         
         IF(m.GT.1) THEN
-           FIELD(m)%V = (FIELD(m)%X*J_x  + DCMPLX(0.0,-1.0)*FIELD(m)%Y*J_y + FIELD(m)%Z*J_z) 
+           FIELD(m)%V =            (FIELD(m)%X*EXP(DCMPLX(0.0,1.0)*FIELD(m)%phi_x)*J_x  + &
+                &  DCMPLX(0.0,-1.0)*FIELD(m)%Y*EXP(DCMPLX(0.0,1.0)*FIELD(m)%phi_y)*J_y  + &
+                                    FIELD(m)%Z*EXP(DCMPLX(0.0,1.0)*FIELD(m)%phi_z)*J_z) 
            FIELD(m)%V = MATMUL(TRANSPOSE(CONJG(U_ZEEMAN)),MATMUL(FIELD(m)%V,U_ZEEMAN))
+!           write(*,*) m, field(m)%X
+
         END IF
      END DO
      KD = SIZE(U_ZEEMAN,1)
@@ -538,7 +545,6 @@ SUBROUTINE SETHAMILTONIANCOMPONENTS(ID,NM,NF,MODES_NUM,FIELD,INFO)
         KD = KD*(2*N_FLOQUET_+1)
      END DO
      KD = KD + SIZE(U_ZEEMAN,1) - 1
-     !DEALLOCATE(E_ZEEMAN)
 
   END SELECT
   
