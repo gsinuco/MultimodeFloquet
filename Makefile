@@ -21,7 +21,7 @@ MKLINC = /opt/intel/compilers_and_libraries/linux/mkl/include
 # MAKE LIBRARY AND ALL EXECUTABLES
 ###################################
 
-all: all_examples lib lib_lapack
+all:  lib all_examples
 
 all_examples: Example_lib Example_lib_sp Example_lib_c Example_lib_c_sp
 
@@ -230,4 +230,4 @@ build/MultimodeFloquet.o:src/MultimodeFloquet.f90
 ############################
 
 clean:
-	rm build/*.o ./*mod build/MultimodeFloquet* include/* lib/*
+	rm build/*.o ./*mod build/MultimodeFloquet* include/*.mod lib/*.a
