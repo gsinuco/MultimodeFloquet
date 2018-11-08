@@ -6,3 +6,5 @@
 *.datt
 *.txt~
 *.scd
+*.plt~
+#*#
