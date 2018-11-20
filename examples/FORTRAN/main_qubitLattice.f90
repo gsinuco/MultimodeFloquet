@@ -14,7 +14,7 @@ PROGRAM MULTIMODEFLOQUET
   TYPE(ATOM)                                       ID
   INTEGER,          DIMENSION(:),   ALLOCATABLE :: MODES_NUM
   INTEGER                                          TOTAL_FREQUENCIES,D_BARE
-  INTEGER                                          INFO,m,INDEX0,r
+  INTEGER                                          INFO,m,INDEX0,r,i_
   DOUBLE PRECISION, DIMENSION(:),   ALLOCATABLE :: ENERGY,E_FLOQUET
   COMPLEX*16,       DIMENSION(:,:), ALLOCATABLE :: H__,U_F,U_AUX,U_B2D,dh2,dh3,U_dt,Qubit_IDENTITY
   DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: P_AVG,W2,W3
@@ -61,7 +61,8 @@ PROGRAM MULTIMODEFLOQUET
   Qubit_IDENTITY(2,2) = 1.0
   
   !eq. (20), arxiv 1612.02143
-  m_    = 2.2
+  DO i_ = 1,6
+  m_    = 1.2 + (i_-1)*1.0/5.0
   eta   = 2.0
   phi1  = pi/10.0
   phi2  = 0.0
@@ -83,7 +84,7 @@ PROGRAM MULTIMODEFLOQUET
   FIELDS(2)%phi_y = 0.0
   FIELDS(2)%phi_z = phi1 
   FIELDS(2)%omega = 0.1
-  FIELDS(2)%N_Floquet = 12
+  FIELDS(2)%N_Floquet = 13
 
   FIELDS(3)%X     =  0.0
   FIELDS(3)%Y     =  2.0*eta
@@ -92,14 +93,8 @@ PROGRAM MULTIMODEFLOQUET
   FIELDS(3)%phi_y = phi2 - pi/2
   FIELDS(3)%phi_z = phi2
   FIELDS(3)%omega = gamma*FIELDS(2)%OMEGA
-  FIELDS(3)%N_Floquet = 12
+  FIELDS(3)%N_Floquet = 13
  
-  DO m=1,TOTAL_FREQUENCIES    
-     FIELDS(m)%X = FIELDS(m)%X*exp(DCMPLX(0.0,1.0)*FIELDS(m)%phi_x)
-     FIELDS(m)%Y = FIELDS(m)%Y*exp(DCMPLX(0.0,1.0)*FIELDS(m)%phi_y)
-     FIELDS(m)%Z = FIELDS(m)%Z*exp(DCMPLX(0.0,1.0)*FIELDS(m)%phi_z)
-  END DO
-
   CALL SETHAMILTONIANCOMPONENTS(ID,size(modes_num,1),total_frequencies,MODES_NUM,FIELDS,INFO)
 
   !--- FIND THE MULTIMODE FLOQUET SPECTRUM 
@@ -118,18 +113,18 @@ PROGRAM MULTIMODEFLOQUET
   
   !--- EVALUATE TIME-EVOLUTION OPERATOR IN THE BARE BASIS
   T1 = 0.0
-  dt = 0.001
+  dt = 0.00005
   T2 = T1 + dt
   CALL MULTIMODETIMEEVOLUTINOPERATOR(SIZE(U_F,1),SIZE(MODES_NUM,1),MODES_NUM,U_F,E_FLOQUET,ID%D_BARE,FIELDS,T1,T2,U_dt,INFO) 
   U_AUX = Qubit_IDENTITY
-  DO r=1,25600
+  DO r=1,512000
      dh2 = 2.0*eta*FIELDS(2)%OMEGA*(                 J_x*cos(fields(2)%omega*T2+phi1) + J_z*sin(fields(2)%omega*T2+phi1))*dt
      dh3 = 2.0*eta*FIELDS(3)%OMEGA*(DCMPLX(0.0,-1.0)*J_y*cos(fields(3)%omega*T2+phi2) + J_z*sin(fields(3)%omega*T2+phi2))*dt
      U_AUX = MATMUL(U_dt,U_AUX)
      W2 = W2 + MATMUL(TRANSPOSE(CONJG(U_AUX)),MATMUL(dh2,U_AUX))
      W3 = W3 + MATMUL(TRANSPOSE(CONJG(U_AUX)),MATMUL(dh3,U_AUX))     
      T2 = T2 + dt
-     IF(MOD(r,100).EQ.0) WRITE(3,*) t2,ABS(U_AUX)**2,W2,W3
+     IF(MOD(r,2000).EQ.0) WRITE(3,*) i_,t2,ABS(U_AUX)**2,W2,W3
   END DO
   WRITE(3,*)
   WRITE(3,*)
@@ -148,7 +143,7 @@ PROGRAM MULTIMODEFLOQUET
   WRITE(3,*)
   DEALLOCATE(E_FLOQUET)
   DEALLOCATE(U_F)
-
+  END DO
 
 END PROGRAM MULTIMODEFLOQUET
 

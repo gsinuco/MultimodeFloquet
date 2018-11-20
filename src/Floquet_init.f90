@@ -19,9 +19,9 @@ SUBROUTINE SET_ATOMIC_PARAMETERS(ATOMICSPECIE,MANIFOLD,JTOTAL,ID,INFO)
   CASE("87Rb")
      mass_at = 87*amu
      I       = I_87Rb
-     g_I     = gI_87Rb
+     g_I     = g_I_87Rb
      J       = J_87Rb
-     g_J     = gJ_87Rb
+     g_J     = g_J_87Rb
      A       = A_87Rb
      a_s     = a_s_87Rb
      alpha_E = alpha_E_87Rb
@@ -33,9 +33,9 @@ SUBROUTINE SET_ATOMIC_PARAMETERS(ATOMICSPECIE,MANIFOLD,JTOTAL,ID,INFO)
   CASE ("6Li")
      mass_at = 6*amu
      I       = I_6Li
-     g_I     = I_6Li
+     g_I     = g_I_6Li
      J       = J_6Li
-     g_J     = J_6Li
+     g_J     = g_J_6Li
      A       = A_6Li
      a_s     = a_s_6Li
      alpha_E = alpha_E_6Li

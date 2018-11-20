@@ -21,9 +21,11 @@
           <in>main_DressedQubit.f90</in>
           <in>main_DressedQubit_DRIVER.f90</in>
           <in>main_DressedQubit_SP.f90</in>
-          <in>main_Lattice.f90</in>
+          <in>main_KitaevChain.f90</in>
+          <in>main_MKL_SP.f90</in>
           <in>main_QuantumInterference.f90</in>
           <in>main_Release.f90</in>
+          <in>main_lattice.f90</in>
           <in>main_qubit.f90</in>
           <in>main_qubitLattice.f90</in>
           <in>main_qubitLattice_DRIVER.f90</in>
@@ -95,13 +97,10 @@
         <in>main_DressedQubit.f90</in>
         <in>main_DressedQubit_SP.cpp</in>
         <in>main_DressedQubit_SP.f90</in>
-        <in>main_Release.f90</in>
         <in>main_qubit.cpp</in>
         <in>main_qubit.f90</in>
         <in>main_qubit_SP.f90</in>
         <in>main_qubit_sp.cpp</in>
-        <in>main_random.f90</in>
-        <in>main_release.cpp</in>
         <in>modes.f90</in>
         <in>modes_C.f90</in>
         <in>quick-sort-index-table.f90</in>

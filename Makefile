@@ -140,8 +140,11 @@ build/modes.o: src/modes.f90
 build/Modules.o: src/Modules.f90
 	$(GF) -c -o $@ src/Modules.f90  -g
 
-build/Modules_release.o: build/Modules.o src/Modules_release.f90
-	$(GF) -c -o $@ src/Modules_release.f90  -g
+#build/Modules_release.o: build/Modules.o src/Modules_release.f90
+#	$(GF) -c -o $@ src/Modules_release.f90  -g
+
+build/Modules_release.o: build/Modules.o src/AlkaliAtoms_parameters.f90
+	$(GF) -c -o $@ src/AlkaliAtoms_parameters.f90  -g
 
 build/delta_kr.o: src/delta_kr.f90
 	$(GF) -c -o $@ src/delta_kr.f90  -g
