@@ -13,7 +13,7 @@ SUBROUTINE SET_ATOMIC_PARAMETERS_C(ATOMICSPECIE,MANIFOLD,JTOTAL,ID_C,INFO)
   INTEGER, INTENT(INOUT) :: INFO
   INFO = 0
 
-  CALL SET_ATOMIC_PARAMETERS(ATOMICSPECIE,MANIFOLD,JTOTAL,ATOM_,INFO)
+  CALL SET_ATOMIC_PARAMETERS(ATOMICSPECIE,MANIFOLD,1.0D0*JTOTAL,ATOM_,INFO)
 
 END SUBROUTINE SET_ATOMIC_PARAMETERS_C
 
@@ -43,7 +43,8 @@ SUBROUTINE FLOQUETINIT_C(length_name,atomicspecie,manifold,JTOTAL,ID_C,info)
   
   CHARACTER(length_name), INTENT(IN)    :: ATOMICSPECIE
   CHARACTER(1),           INTENT(IN)    :: MANIFOLD  !
-  INTEGER,                    INTENT(IN)    :: length_name,JTOTAL
+  INTEGER,                    INTENT(IN)    :: length_name!,JTOTAL
+  DOUBLE PRECISION,           INTENT(IN)    :: JTOTAL
   TYPE(ATOM_C),               INTENT(OUT)   :: ID_C
   INTEGER,                    INTENT(INOUT) :: INFO
 
@@ -52,7 +53,7 @@ SUBROUTINE FLOQUETINIT_C(length_name,atomicspecie,manifold,JTOTAL,ID_C,info)
   CHARACTER(length_name) atomicspecie_F
 
   atomicspecie_F = atomicspecie(1:length_name)
-  CALL FLOQUETINIT(atomicspecie_F,manifold,JTOTAL,ATOM_,info)
+  CALL FLOQUETINIT(atomicspecie_F,manifold,1.0D0*JTOTAL,ATOM_,info)
 
   ID_C%id_system = ATOM_%id_system
   ID_C%D_BARE    = ATOM_%D_BARE

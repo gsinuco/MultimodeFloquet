@@ -10,21 +10,32 @@
         <df name="CPP">
           <in>MultimodeFloquet.h</in>
           <in>main_DressedQubit.cpp</in>
+          <in>main_DressedQubitV2.cpp</in>
           <in>main_DressedQubit_SP.cpp</in>
           <in>main_qubit.cpp</in>
           <in>main_qubit_sp.cpp</in>
           <in>main_release.cpp</in>
         </df>
         <df name="FORTRAN">
+          <df name="Rb87">
+            <in>main_87Rb_RFMW_SPECTRUM.f90</in>
+            <in>main_87Rb_RFMW_SPECTRUM_SP.f90</in>
+            <in>main_87Rb_RFx1_SPECTRUM.f90</in>
+            <in>main_87Rb_RFx2_SPECTRUM.f90</in>
+            <in>main_87Rb_RFx2_SPECTRUM_B.f90</in>
+            <in>main_87Rb_RFx2_SPECTRUM_SP.f90</in>
+          </df>
           <in>main_87Rb_RFMW_DRIVER.f90</in>
           <in>main_87Rb_RF_DRIVER.f90</in>
           <in>main_DressedQubit.f90</in>
+          <in>main_DressedQubitV2.f90</in>
           <in>main_DressedQubit_DRIVER.f90</in>
           <in>main_DressedQubit_SP.f90</in>
           <in>main_KitaevChain.f90</in>
           <in>main_MKL_SP.f90</in>
           <in>main_QuantumInterference.f90</in>
           <in>main_Release.f90</in>
+          <in>main_halfspin_DRIVER.f90</in>
           <in>main_lattice.f90</in>
           <in>main_qubit.f90</in>
           <in>main_qubitLattice.f90</in>
@@ -35,6 +46,7 @@
           <in>main_qubit_Shirley.f90</in>
           <in>main_qubit_noise_SP.f90</in>
           <in>main_spin_DRIVER.f90</in>
+          <in>main_threesiteslattice.f90</in>
           <in>newfile.cpp</in>
         </df>
       </df>
@@ -47,6 +59,7 @@
         <in>mergingarrays.mod</in>
         <in>mergingarrays_c.mod</in>
         <in>modes_4f.mod</in>
+        <in>passing2c.mod</in>
         <in>physical_constants.mod</in>
         <in>sparse_interface.mod</in>
         <in>subinterface.mod</in>
@@ -87,10 +100,13 @@
         <in>MultimodeHamiltonian_SP.f90</in>
         <in>MultimodeHamiltonian_SP_C.f90</in>
         <in>MultimodeMicroMotion.f90</in>
+        <in>MultimodeMicroMotionDressedBasis.f90</in>
+        <in>MultimodeMicroMotionDressedBasis_C.f90</in>
         <in>MultimodeMicroMotion_C.f90</in>
         <in>MultimodeTransitionAVG.f90</in>
         <in>MultimodeTransitionAVG_C.f90</in>
         <in>Runge-Kutta4thorder.f90</in>
+        <in>TestingUnitarity.f90</in>
         <in>VarCRSPacking.f90</in>
         <in>delta_kr.f90</in>
         <in>main_DressedQubit.cpp</in>
@@ -116,6 +132,7 @@
       <in>mergingarrays.mod</in>
       <in>mergingarrays_c.mod</in>
       <in>modes_4f.mod</in>
+      <in>passing2c.mod</in>
       <in>physical_constants.mod</in>
       <in>sparse_interface.mod</in>
       <in>subinterface.mod</in>

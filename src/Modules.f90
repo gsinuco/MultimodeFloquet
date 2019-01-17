@@ -68,6 +68,7 @@ MODULE subinterface
           
 
      SUBROUTINE SET_ATOMIC_PARAMETERS(ATOMICSPECIE,MANIFOLD,JTOTAL,ID,INFO)
+     !SUBROUTINE SET_ATOMIC_PARAMETERS(ATOMICSPECIE,MANIFOLD,JTOTAL,JTOTAL_HALF,ID,INFO)
        ! ATOMICSPECIE: 87Rb,6Li,Cs,41K,qubit,lattice, SPIN
        ! MANIFOLD : "U" UPPER HYPERFINE MANIFOLD, "L" LOWER HYPERFIND MANIFOLD, "B" BOTH
        ! JTOTAL   :  IF ATOMICSPECIE .EQ. SPIN THEN JTOTAL IS THE TOTAL ANGULAR MOMENTUM OF THE SPIN
@@ -76,11 +77,56 @@ MODULE subinterface
        IMPLICIT NONE
        CHARACTER (LEN=*),OPTIONAL, INTENT(IN) :: ATOMICSPECIE
        CHARACTER (LEN=*),OPTIONAL, INTENT(IN) :: MANIFOLD  !
-       INTEGER,          OPTIONAL, INTENT(IN) :: JTOTAL
-       TYPE(ATOM),INTENT(OUT) :: ID
+       !INTEGER,          OPTIONAL, INTENT(IN) :: JTOTAL
+       DOUBLE PRECISION,          OPTIONAL, INTENT(IN) :: JTOTAL
+       TYPE(ATOM),OPTIONAL,INTENT(OUT) :: ID       
        INTEGER, INTENT(INOUT) :: INFO
      END SUBROUTINE SET_ATOMIC_PARAMETERS
 
+     SUBROUTINE MICROMOTIONFOURIERDRESSEDBASIS(ID,DRESSINGFIELDS_INDICES,MODES_NUM,FIELDS, U_FD,E_DRESSED,INFO)
+       ! ID        (in)    :: TYPE(ATOM) system ID
+       ! DRESSINGFIELDS_INDICES (in) :: integer array indicating the indices of the dressing modes
+       ! MODES_NUM (in)    :: integer array indicating the number of harmonics of all driving modes 
+       ! FIELDS    (in)    :: Array of TYPE(MODE) of dimension 
+       ! U_FD      (out)   :: complex*16 matrix fourier decomposition of the micromotion operator of the dressed basis
+       ! E_DRESSED (out)   :: dressed energies
+       ! INFO      (inout) :: error flag
+       USE TYPES
+
+       TYPE(ATOM),                     INTENT(IN)  :: ID
+       INTEGER,    DIMENSION(:),       INTENT(IN)  :: DRESSINGFIELDS_INDICES
+       INTEGER,    DIMENSION(:),       INTENT(IN)  :: MODES_NUM
+       TYPE(MODE), DIMENSION(:),       INTENT(IN)  :: FIELDS
+       COMPLEX*16, DIMENSION(:,:),     INTENT(OUT) :: U_FD
+       DOUBLE PRECISION, DIMENSION(:), INTENT(OUT) :: E_DRESSED
+     END SUBROUTINE MICROMOTIONFOURIERDRESSEDBASIS
+
+     SUBROUTINE MICROMOTIONDRESSEDBASIS(ID,MODES_NUM,DRESSINGFIELDS_INDICES,&
+          & FIELDS,U_F_MODES,E_MULTIFLOQUET,T1,U,INFO) 
+       
+       ! ID (in)        :: TYPE(ATOM) system ID
+       ! MODES_NUM (in) :: integer array indicating the number of harmonics of each driving mode
+       ! DRESSINFIELDS_INDICES :: integer array indicating the indices of the dressing modes
+       ! FIELDS         :: Array of TYPE(MODES) with NM components (all driving fields)
+       ! U_F_MODES      :: complex*16 matrix of dimension DxD. Fourier decomposition of the micromotion operator of the dressed basis
+       ! E_MULTIFLOQUET :: dressed energies
+       ! T1             :: double precision, time
+       ! U              :: complex*16 matrix of dimension D_BARE x D_BARE. micromotion operator at time T1
+       ! INFO           :: error flag
+       
+       
+       USE TYPES
+       IMPLICIT NONE
+       TYPE(ATOM),                       INTENT(IN)    :: ID
+       INTEGER,          DIMENSION(:),   INTENT(IN)    :: MODES_NUM
+       INTEGER,          DIMENSION(:),   INTENT(IN)    :: DRESSINGFIELDS_INDICES
+       COMPLEX*16,       DIMENSION(:,:), INTENT(IN)    :: U_F_MODES
+       DOUBLE PRECISION, DIMENSION(:),   INTENT(IN)    :: E_MULTIFLOQUET
+       TYPE(MODE),       DIMENSION(:),   INTENT(IN)    :: FIELDS
+       DOUBLE PRECISION ,                INTENT(IN)    :: T1
+       COMPLEX*16,       DIMENSION(:,:), INTENT(OUT)   :: U
+       INTEGER,                          INTENT(INOUT) :: INFO
+     END SUBROUTINE MICROMOTIONDRESSEDBASIS
   END INTERFACE
 END MODULE subinterface
 
@@ -122,7 +168,9 @@ END MODULE SUBINTERFACE_LAPACK
 
 MODULE FLOQUETINIT_
   INTERFACE
+     !SUBROUTINE FLOQUETINIT(atomicspecie,manifold,JTOTAL,JTOTAL_HALF,ID,info)
      SUBROUTINE FLOQUETINIT(atomicspecie,manifold,JTOTAL,ID,info)
+!       SUBROUTINE FLOQUETINIT(atomicspecie,manifold,JTOTAL,omega_vector,FIELDS,ID,info)
        ! ATOMICSPECIE: 87Rb,6Li,Cs,41K,qubit,lattice, SPIN
        ! MANIFOLD : "U" UPPER HYPERFINE MANIFOLD, "L" LOWER HYPERFIND MANIFOLD, "B" BOTH
        ! JTOTAL   :  IF ATOMICSPECIE .EQ. SPIN THEN JTOTAL IS THE TOTAL ANGULAR MOMENTUM OF THE SPIN
@@ -140,9 +188,13 @@ MODULE FLOQUETINIT_
        
        CHARACTER (LEN=*),OPTIONAL, INTENT(IN)    :: ATOMICSPECIE
        CHARACTER (LEN=*),OPTIONAL, INTENT(IN)    :: MANIFOLD  !
-       INTEGER,          OPTIONAL, INTENT(IN)    :: JTOTAL
+       !INTEGER,          OPTIONAL, INTENT(IN)    :: JTOTAL
+       !REAL,             OPTIONAL, INTENT(IN)    :: JTOTAL
+       DOUBLE PRECISION,  OPTIONAL, INTENT(IN)    :: JTOTAL
        TYPE(ATOM),       OPTIONAL, INTENT(OUT)   :: ID
        INTEGER,                    INTENT(INOUT) :: INFO
+       !TYPE(MODE), OPTIONAL, DIMENSION(:), ALLOCATABLE,INTENT(OUT) :: FIELDS
+       !INTEGER,    OPTIONAL, DIMENSION(:), INTENT(IN):: omega_vector
        
      END SUBROUTINE FLOQUETINIT
   END INTERFACE

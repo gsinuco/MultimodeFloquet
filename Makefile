@@ -31,6 +31,7 @@ lib:build/modes.o build/Modules.o build/Modules_release.o build/delta_kr.o build
  build/MKLSparseEigenValues.o build/util.o build/quick-sort-index-table.o build/VarCRSPacking.o \
  build/sparse_utils.o build/MultimodeHamiltonian_SP.o build/MultimodeHamiltonian.o \
  build/MultimodeFloquetTE.o build/MultimodeFloquetTE_DRIVER.o build/MultimodeMicroMotion.o \
+ build/MultimodeMicroMotionDressedBasis.o build/MultimodeMicroMotionDressedBasis_C.o \
  build/MultimodeTransitionAVG.o build/MultimodeDressedBasis.o build/MultimodeDressedBasis_SP.o \
  build/util_c.o build/modes_C.o build/Floquet_init_C.o build/MultimodeHamiltonian_SP_C.o  \
  build/MultimodeHamiltonian_C.o build/LapackEigenValues_C.o build/MultimodeTransitionAVG_C.o \
@@ -45,6 +46,7 @@ lib_lapack :build/modes.o build/Modules.o build/Modules_release.o build/delta_kr
  build/util.o build/quick-sort-index-table.o build/VarCRSPacking.o \
  build/sparse_utils.o build/MultimodeHamiltonian.o \
  build/MultimodeFloquetTE.o build/MultimodeFloquetTE_DRIVER.o build/MultimodeMicroMotion.o \
+ build/MultimodeMicroMotionDressedBasis.o build/MultimodeMicroMotionDressedBasis_C.o \
  build/MultimodeTransitionAVG.o build/MultimodeDressedBasis.o \
  build/util_c.o build/modes_C.o build/Floquet_init_C.o \
  build/MultimodeHamiltonian_C.o build/LapackEigenValues_C.o build/MultimodeTransitionAVG_C.o \
@@ -55,7 +57,7 @@ lib_lapack :build/modes.o build/Modules.o build/Modules_release.o build/delta_kr
 	cp *.mod ./include/
 
 
-Example_lib: ./examples/FORTRAN/main_qubit.f90  ./examples/FORTRAN/main_DressedQubit.f90
+Example_lib: ./examples/FORTRAN/main_qubit.f90  ./examples/FORTRAN/main_DressedQubit.f90 
 	$(GF) -o ./examples/FORTRAN/qubit  ./examples/FORTRAN/main_qubit.f90 -I./include/ -L./lib/ -lmultimodefloquet $(GFFLAGS)
 	$(GF) -o ./examples/FORTRAN/dressedqubit  ./examples/FORTRAN/main_DressedQubit.f90 -I./include/ -L./lib/ -lmultimodefloquet $(GFFLAGS)
 
@@ -63,9 +65,10 @@ Example_lib_sp: ./examples/FORTRAN/main_qubit_SP.f90 ./examples/FORTRAN/main_Dre
 	$(GF) -o ./examples/FORTRAN/qubit_sp  ./examples/FORTRAN/main_qubit_SP.f90 -I./include/ -L./lib/ -lmultimodefloquet -L$(MKLLIBS) -I$(MKLINC) $(GFFLAGS_SP) $(MKLFLAGS)
 	$(GF) -o ./examples/FORTRAN/dressedqubit_sp  ./examples/FORTRAN/main_DressedQubit_SP.f90 -I./include/ -L./lib/ -lmultimodefloquet -L$(MKLLIBS) -I$(MKLINC) $(GFFLAGS_SP) $(MKLFLAGS)
 
-Example_lib_c: ./examples/CPP/main_qubit.cpp  ./examples/CPP/main_DressedQubit.cpp
+Example_lib_c: ./examples/CPP/main_qubit.cpp  ./examples/CPP/main_DressedQubit.cpp ./examples/CPP/main_DressedQubitV2.cpp
 	$(CPP) -o ./examples/CPP/qubit  ./examples/CPP/main_qubit.cpp -I./include/ -L./lib/ -lmultimodefloquet -lgfortran $(GFFLAGS)
 	$(CPP) -o ./examples/CPP/dressedqubit  ./examples/CPP/main_DressedQubit.cpp -I./include/ -L./lib/ -lmultimodefloquet -lgfortran $(GFFLAGS)
+# (CPP) -o ./examples/CPP/dressedqubitdV2  ./examples/CPP/main_DressedQubitV2.cpp -I./include/ -L./lib/ -lmultimodefloquet -lgfortran $(GFFLAGS)
 
 Example_lib_c_sp: ./examples/CPP/main_qubit_sp.cpp ./examples/CPP/main_DressedQubit_SP.cpp
 	$(CPP) -o  ./examples/CPP/qubit_sp         ./examples/CPP/main_qubit_sp.cpp        -I./include/ -L./lib/ -lmultimodefloquet -lgfortran -L$(MKLLIBS) -I$(MKLINC) $(GFFLAGS_SP) $(MKLFLAGS)         
@@ -98,6 +101,9 @@ build/MultimodeTransitionAVG_C.o: build/modes_C.o build/MultimodeTransitionAVG.o
 
 build/MultimodeMicroMotion_C.o: build/modes_C.o build/MultimodeMicroMotion.o src/MultimodeMicroMotion_C.f90
 	$(GF) -c -o $@  build/modes_C.o build/MultimodeMicroMotion.o src/MultimodeMicroMotion_C.f90  -g
+
+build/MultimodeMicroMotionDressedBasis_C.o: build/modes_C.o build/MultimodeMicroMotionDressedBasis.o src/MultimodeMicroMotionDressedBasis_C.f90
+	$(GF) -c -o $@  build/modes_C.o build/MultimodeMicroMotionDressedBasis.o src/MultimodeMicroMotionDressedBasis_C.f90  -g
 
 build/MultimodeFloquetTE_DRIVER_C.o: build/modes_C.o build/MultimodeFloquetTE_DRIVER.o src/MultimodeFloquetTE_DRIVER_C.f90
 	$(GF) -c -o $@  build/modes_C.o build/MultimodeFloquetTE_DRIVER.o src/MultimodeFloquetTE_DRIVER_C.f90  -g
@@ -191,6 +197,9 @@ build/MultimodeFloquetTE_DRIVER.o: build/MultimodeHamiltonian.o src/MultimodeFlo
 build/MultimodeMicroMotion.o:src/MultimodeMicroMotion.f90
 	$(GF) -o $@ -c src/MultimodeMicroMotion.f90  -g
 
+build/MultimodeMicroMotionDressedBasis.o:src/MultimodeMicroMotionDressedBasis.f90
+	$(GF) -o $@ -c src/MultimodeMicroMotionDressedBasis.f90  -g
+
 build/MultimodeTransitionAVG.o:src/MultimodeTransitionAVG.f90
 	$(GF) -o $@ -c src/MultimodeTransitionAVG.f90  -g
 
@@ -223,6 +232,7 @@ build/MultimodeFloquet.o:src/MultimodeFloquet.f90
 #build/MultimodeFloquetTE.o
 #build/MultimodeFloquetTE_DRIVER.o
 #build/MultimodeMicroMotion.o
+#build/MultimodeMicroMotionDressedBasis.o
 #build/MultimodeTransitionAVG.o
 #build/MultimodeDressedBasis.o
 #build/MultimodeDressedBasis_SP.o

@@ -42,9 +42,13 @@ extern "C" {
     
   // DEFINITION OF DRESSED BASIS
   void            dressedbasis_c_(int * h_floquet_size,atom_c *id,int * nm, int * modes_num,mode_c * fields, dcmplx * U_FD, double * e_dressed,int * info); 
-  void     dressedbasis_subset_c_(atom_c *id, int * dressingfloquetdimension,int * dressingields, int * nm, int * dressingfields_indices, int * modes_num,mode_c * fields, dcmplx * U_FD, double * e_dressed,int * info);
-  void         dressedbasis_sp_c_(int h_floquet_size, atom_c *id, int * nm, int * modes_num, mode_c * fields, dcmplx * U_FD, double * e_dressed, int * info);
-  void  dressedbasis_subset_sp_c_(atom_c * id, int * dressingfloquetdimension,int * dressingfields,int * nm,int * dressingfields_indices, int * modes_num,mode_c * fields, dcmplx * U_FD, double * e_dressed,int * info);
+  void  dressedbasis_subset_c_(atom_c *id , int * dressingfloquetdimension,int * dressingfields, int * nm, int * dressingfields_indices, int * modes_num,mode_c * fields, dcmplx * U_FD, double * e_dressed,int * info);
+  void  dressedbasis_subset_sp_c_(atom_c * id, int * dressingfloquetdimension,int * dressingfields,int * nm, int * dressingfields_indices, int * modes_num,mode_c * fields, dcmplx * U_FD, double * e_dressed,int * info);
+  void  dressedbasis_sp_c_(int h_floquet_size, atom_c *id, int * nm, int * modes_num, mode_c * fields, dcmplx * U_FD, double * e_dressed, int * info);
+  void micromotionfourierdressedbasis_c_(atom_c *id , int * dressingfields_indices, int * modes_num,mode_c * fields,int * info);
+  void micromotiondressedbasis_c_(atom_c *id , int * modes_num, int * dressingfields_indices, mode_c * fields, double T1, dcmplx * U, int * info);
+  //  SUBROUTINE MICROMOTIONFOURIERDRESSEDBASIS_C(ID,DRESSINGFIELDS_INDICES,MODES_NUM,FIELDS, U_FD,E_DRESSED,INFO)
+  ///     SUBROUTINE MICROMOTIONDRESSEDBASIS_C(ID,MODES_NUM,DRESSINGFIELDS_INDICES,FIELDS,U_F_MODES,E_MULTIFLOQUET,T1,U,INFO) 
 
   
   // UTILITY FUNCTION: EXTRACT GLOBAL VARIABLES WITH SCOPE ONLY WITHIN FORTRAN

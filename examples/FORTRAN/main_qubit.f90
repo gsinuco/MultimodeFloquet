@@ -23,16 +23,13 @@ PROGRAM MULTIMODEFLOQUET
 
 
 
-
-
-
   OPEN(UNIT=3,FILE="qubit_oscillation_.dat",ACTION="WRITE")
   OPEN(UNIT=4,FILE="qubit_avgtransition_.dat",ACTION="WRITE")
 
 
 
   INFO = 0
-  CALL FLOQUETINIT('qubit','U',2,ID,INFO)  
+  CALL FLOQUETINIT('qubit','U',0.2D1,ID,INFO)  
 
   D_BARE = ID%D_BARE
   ALLOCATE(P_AVG(D_BARE,D_BARE))
@@ -66,7 +63,7 @@ PROGRAM MULTIMODEFLOQUET
   FIELDS(2)%phi_y = 0.0
   FIELDS(2)%phi_z = 0.0
   FIELDS(2)%omega = 1.0
-  FIELDS(2)%N_Floquet = 20
+  FIELDS(2)%N_Floquet = 200
 
   DO m=1,128
 
