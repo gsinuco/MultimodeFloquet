@@ -60,5 +60,5 @@ Example_lib_f_sp: main_qubit_SP.f90 main_DressedQubit_SP.f90  main_qubitLattice_
 ############################
 
 clean:
-	rm qubit dressedqubit qubit_sp dressedqubit_sp dressedRb87_DRIVER spin_driver dressedqubit_DRIVER qubit_driver lattice qubitL qubitL_driver qubitL_SP qubit_noise_SP qubit_shirley shakenlattice twophoton dressedqubitV2 dressedRb87_SPECTRUM fermionicspin KitaevLattice test_SP *.*~ *.mod
+	rm qubit dressedqubit qubit_sp dressedqubit_sp spin_driver dressedqubit_DRIVER qubit_driver qubitL qubitL_driver qubitL_SP qubit_noise_SP qubit_shirley shakenlattice twophoton dressedqubitV2 fermionicspin KitaevLattice test_SP qubit_sp_test
 

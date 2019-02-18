@@ -44,4 +44,4 @@ Example_lib_c_sp: main_qubit_sp.cpp main_DressedQubit_SP.cpp
 ############################
 
 clean:
-	rm qubit dressedqubit qubit_sp dressedqubit_sp dressedqubitV2
+	rm qubit dressedqubit qubit_sp dressedqubit_sp 

@@ -21,8 +21,7 @@ MKLINC = /opt/intel/compilers_and_libraries/linux/mkl/include
 # MAKE LIBRARY AND ALL EXECUTABLES
 ###################################
 
-all:  lib lib_lapack 
-#all_examples
+all:  lib lib_lapack all_examples
 
 all_examples: Example_lib Example_lib_sp Example_lib_c Example_lib_c_sp
 
