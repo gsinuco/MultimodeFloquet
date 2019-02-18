@@ -30,8 +30,8 @@ int main(){
   FILE *disco0;
   FILE *disco1;
 
-  //disco0 = fopen("qubit_bareoscillation.dat","w");
-  //disco1 = fopen("qubit_dressedoscillation.dat","w");
+  disco0 = fopen("qubit_bareoscillation.dat","w");
+  disco1 = fopen("qubit_dressedoscillation.dat","w");
 
   info   = 0;
   jtotal = 2;
@@ -85,7 +85,7 @@ int main(){
   fields[2].N_Floquet = 6;
 
   //printf("%i %i \n",d_bare,total_frequencies);
-
+  
   sethamiltoniancomponents_c_(&id,&nm,&total_frequencies,modes_num,fields,&info);
          
   // =================================================================================
@@ -145,7 +145,7 @@ int main(){
   dcmplx * U_F2_red = new dcmplx [d_bare*d_bare];                   // selection of a single dressed manifold at time t2
   
   // ! ========= FIND THE MULTIMODE FLOQUET SPECTRUM 
-
+  
   for(r=0;r<6;r++){
 
     // ====== SET THE DRESSING FREQUENCY
@@ -227,7 +227,7 @@ int main(){
     delete(e_floquet);
     delete(U_F);
   }
-
+  
   return 0;
 }
 

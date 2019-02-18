@@ -16,7 +16,7 @@ SUBROUTINE SET_ATOMIC_PARAMETERS(ATOMICSPECIE,MANIFOLD,JTOTAL_,ID,INFO)
   INTEGER, INTENT(INOUT) :: INFO
 
   DOUBLE PRECISION  JTOTAL
-  !  write(*,*) JTOTAL_
+!  write(*,*) atomicspecie,jtotal_
   JTOTAL = JTOTAL_/2.0
   !  IF(JTOTAL.NE.JTOTAL_) JTOTAL = JTOTAL_
 
@@ -256,7 +256,7 @@ contains
   INTEGER  r,D_F2,P,r_,p_
   DOUBLE PRECISION, DIMENSION(:),ALLOCATABLE:: Energy
 
-!  write(*,*) atomicspecie
+!  write(*,*) atomicspecie,info,id%d_bare
     
   INFO = 4
   CALL SET_ATOMIC_PARAMETERS(ATOMICSPECIE,'U',0.1D1,ID,INFO)

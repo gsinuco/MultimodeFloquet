@@ -40,7 +40,7 @@ lib:build/modes.o build/Modules.o build/Modules_release.o build/delta_kr.o build
 	$(AR) -urv lib/libmultimodefloquet.a build/*.o
 	$(RANLIB) lib/libmultimodefloquet.a
 	cp *.mod ./include/
-	cp src/*.h ./include
+#	cp src/*.h ./include
 
 lib_lapack :build/modes.o build/Modules.o build/Modules_release.o build/delta_kr.o build/Floquet.o \
  build/I_and_J_representations.o build/F_representation.o build/LapackEigenValues.o \
@@ -56,7 +56,7 @@ lib_lapack :build/modes.o build/Modules.o build/Modules_release.o build/delta_kr
 	$(AR) -urv lib/libmultimodefloquet.a build/*.o
 	$(RANLIB) lib/libmultimodefloquet.a
 	cp *.mod ./include/
-	cp src/*.h ./include
+#	cp src/*.h ./include
 
 
 Example_lib: ./examples/FORTRAN/main_qubit.f90  ./examples/FORTRAN/main_DressedQubit.f90 

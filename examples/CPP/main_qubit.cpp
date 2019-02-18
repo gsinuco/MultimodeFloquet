@@ -20,7 +20,7 @@ int main(){
   char name[]     = "qubit";
   char manifold[] = "U";
 
-
+  
   int r,m,l;
   int d_bare,total_frequencies;
 
@@ -30,7 +30,7 @@ int main(){
   jtotal = 2;
   t1     = 2.0;
   floquetinit_c(&id,name,&info);
-
+  
   d_bare = id.d_bare;
 
   dcmplx * U_AUX = new dcmplx [d_bare*d_bare];
@@ -98,7 +98,7 @@ int main(){
   fields[4].N_Floquet = 1;
 
   //printf("%i %i \n",d_bare,total_frequencies);
-
+  
   for(m=1;m<2;m++){
     
     // --- SET DRIVING PARAMETERS 

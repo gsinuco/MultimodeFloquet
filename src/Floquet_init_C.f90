@@ -34,7 +34,7 @@ END SUBROUTINE DEALLOCATEALL_C
 !     MODULE PROCEDURE FLOQUETINIT_QUBIT_C, FLOQUETINIT_SPIN_C,FLOQUETINIT_ALKALI_C
 !  END INTERFACE FLOQUETINIT_C
 !CONTAINS
-  SUBROUTINE FLOQUETINIT_QUBIT_C(ID,length_name,atomicspecie,INFO)
+  SUBROUTINE FLOQUETINIT_QUBIT_C(ID_C,length_name,ATOMICSPECIE,INFO)
     ! ATOMICSPECIE: 87Rb,6Li,Cs,41K,qubit,lattice, SPIN
     ! MANIFOLD : "U" UPPER HYPERFINE MANIFOLD, "L" LOWER HYPERFIND MANIFOLD, "B" BOTH
     ! JTOTAL   :  IF ATOMICSPECIE .EQ. SPIN THEN JTOTAL IS THE TOTAL ANGULAR MOMENTUM OF THE SPIN
@@ -43,30 +43,31 @@ END SUBROUTINE DEALLOCATEALL_C
     ! initialize all the matrices required for a full Floquet calcuations
     ! Calculate the nuclear, electron and total angular momentum operators
     
-    USE physical_constants ! Standard Module with constants
-    USE ATOMIC_PROPERTIES  ! gF, F , etc. factors for several species
-    USE subinterface       ! To ubroutines for representation of I and J operators
-    USE ARRAYS
-    USE SUBINTERFACE_LAPACK
-    USE TYPES
+    USE TYPES_C
+    USE MODES_4F
     USE FLOQUETINITINTERFACE
     IMPLICIT NONE
 
-    TYPE(ATOM),        INTENT(INOUT) :: ID
-    INTEGER,                    INTENT(IN)    :: length_name!,JTOTAL
-    CHARACTER (LEN=*), INTENT(IN)    :: ATOMICSPECIE
-    INTEGER,           INTENT(INOUT) :: INFO
 
-!    INTEGER  r,D_F2,P,r_,p_
-!    DOUBLE PRECISION, DIMENSION(:),ALLOCATABLE:: Energy
+    CHARACTER(length_name), INTENT(IN)    :: ATOMICSPECIE
+    INTEGER,                    INTENT(IN)    :: length_name!,JTOTAL
+    !DOUBLE PRECISION,           INTENT(IN)    :: JTOTAL
+    TYPE(ATOM_C),               INTENT(OUT)   :: ID_C
+    INTEGER,                    INTENT(INOUT) :: INFO
+
     CHARACTER(length_name) atomicspecie_F
 
     atomicspecie_F = atomicspecie(1:length_name)
-    CALL FLOQUETINIT_QUBIT(ID,atomicspecie_F,INFO)
+    
+    !CALL FLOQUETINIT_OLD(ATOM_,atomicspecie_F,manifold,1.0D0*JTOTAL,info)
+    CALL FLOQUETINIT_QUBIT(ATOM_,atomicspecie_F,INFO)
+    
+    ID_C%id_system = ATOM_%id_system
+    ID_C%D_BARE    = ATOM_%D_BARE
 
   END SUBROUTINE FLOQUETINIT_QUBIT_C
 
-  SUBROUTINE FLOQUETINIT_SPIN_C(ID,length_name,atomicspecie,jtotal,info)
+  SUBROUTINE FLOQUETINIT_SPIN_C(ID_C,length_name,atomicspecie,jtotal,info)
     ! ATOMICSPECIE: 87Rb,6Li,Cs,41K,qubit,lattice, SPIN
     ! MANIFOLD : "U" UPPER HYPERFINE MANIFOLD, "L" LOWER HYPERFIND MANIFOLD, "B" BOTH
     ! JTOTAL   :  IF ATOMICSPECIE .EQ. SPIN THEN JTOTAL IS THE TOTAL ANGULAR MOMENTUM OF THE SPIN
@@ -77,28 +78,31 @@ END SUBROUTINE DEALLOCATEALL_C
     ! initialize all the matrices required for a full Floquet calcuations
     ! Calculate the nuclear, electron and total angular momentum operators
 
-    USE physical_constants ! Standard Module with constants
-    USE ATOMIC_PROPERTIES  ! gF, F , etc. factors for several species
-    USE subinterface       ! To ubroutines for representation of I and J operators
-    USE ARRAYS
-    USE SUBINTERFACE_LAPACK
-    USE TYPES
+    USE TYPES_C
+    USE MODES_4F
     USE FLOQUETINITINTERFACE
     IMPLICIT NONE
 
-    TYPE(ATOM),        INTENT(INOUT) :: ID
-    INTEGER,                    INTENT(IN)    :: length_name!,JTOTAL
-    CHARACTER (LEN=*), INTENT(IN)    :: ATOMICSPECIE
-    DOUBLE PRECISION,  intent(in)    :: jtotal
-    INTEGER,           INTENT(INOUT) :: INFO
-    CHARACTER(length_name) atomicspecie_F
 
+    CHARACTER(length_name), INTENT(IN)    :: ATOMICSPECIE
+    INTEGER,                    INTENT(IN)    :: length_name!,JTOTAL
+    DOUBLE PRECISION,           INTENT(IN)    :: JTOTAL
+    TYPE(ATOM_C),               INTENT(OUT)   :: ID_C
+    INTEGER,                    INTENT(INOUT) :: INFO
+
+    CHARACTER(length_name) atomicspecie_F
+    
     atomicspecie_F = atomicspecie(1:length_name)
-    CALL FLOQUETINIT_SPIN(ID,atomicspecie_F,jtotal,info)
+    CALL FLOQUETINIT_SPIN(ATOM_,atomicspecie_F,jtotal,info)
+    
+    ID_C%id_system = ATOM_%id_system
+    ID_C%D_BARE    = ATOM_%D_BARE
+
+
 
   END SUBROUTINE FLOQUETINIT_SPIN_C
 
-  SUBROUTINE FLOQUETINIT_ALKALI_C(ID,length_name,atomicspecie,length_name2,manifold,info)
+  SUBROUTINE FLOQUETINIT_ALKALI_C(ID_C,length_name,atomicspecie,length_name2,manifold,info)
     ! ATOMICSPECIE: 87Rb,6Li,Cs,41K,qubit,lattice, SPIN
     ! MANIFOLD : "U" UPPER HYPERFINE MANIFOLD, "L" LOWER HYPERFIND MANIFOLD, "B" BOTH
     ! JTOTAL   :  IF ATOMICSPECIE .EQ. SPIN THEN JTOTAL IS THE TOTAL ANGULAR MOMENTUM OF THE SPIN
@@ -109,26 +113,27 @@ END SUBROUTINE DEALLOCATEALL_C
     ! initialize all the matrices required for a full Floquet calcuations
     ! Calculate the nuclear, electron and total angular momentum operators
 
-    USE physical_constants ! Standard Module with constants
-    USE ATOMIC_PROPERTIES  ! gF, F , etc. factors for several species
-    USE subinterface       ! To ubroutines for representation of I and J operators
-    USE ARRAYS
-    USE SUBINTERFACE_LAPACK
-    USE TYPES
+    USE TYPES_C
+    USE MODES_4F
     USE FLOQUETINITINTERFACE
     IMPLICIT NONE
 
-    TYPE(ATOM),        INTENT(INOUT) :: ID
+
+    CHARACTER(length_name), INTENT(IN)    :: ATOMICSPECIE
+    CHARACTER(length_name2), INTENT(IN)    :: manifold
     INTEGER,                    INTENT(IN)    :: length_name,length_name2
-    CHARACTER (LEN=*), INTENT(IN)    :: ATOMICSPECIE
-    CHARACTER (LEN=1), INTENT(IN)    :: MANIFOLD  
-    INTEGER,           INTENT(INOUT) :: INFO
+    TYPE(ATOM_C),               INTENT(OUT)   :: ID_C
+    INTEGER,                    INTENT(INOUT) :: INFO
+
     CHARACTER(length_name) atomicspecie_F
     CHARACTER(length_name2) manifold_F
-
+     
     atomicspecie_F = atomicspecie(1:length_name)
     manifold_F     = manifold(1:length_name2)
-    CALL FLOQUETINIT_ALKALI(ID,atomicspecie_F,manifold,info)
+    CALL FLOQUETINIT_ALKALI(ATOM_,atomicspecie_F,manifold,info)
+    
+    ID_C%id_system = ATOM_%id_system
+    ID_C%D_BARE    = ATOM_%D_BARE
 
   END SUBROUTINE FLOQUETINIT_ALKALI_C
 
