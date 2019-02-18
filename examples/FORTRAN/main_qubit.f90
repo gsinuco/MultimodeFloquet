@@ -1,35 +1,30 @@
-
 PROGRAM MULTIMODEFLOQUET
 
   USE ATOMIC_PROPERTIES
   USE TYPES
   USE SUBINTERFACE
   USE SUBINTERFACE_LAPACK
-  USE FLOQUETINIT_ 
   USE ARRAYS 
-
+  USE FLOQUETINITINTERFACE
 
   IMPLICIT NONE
   TYPE(MODE),       DIMENSION(:),   ALLOCATABLE :: FIELDS
   TYPE(ATOM)                                       ID
   INTEGER,          DIMENSION(:),   ALLOCATABLE :: MODES_NUM
   INTEGER                                          TOTAL_FREQUENCIES,D_BARE
-  INTEGER                                          INFO,m,INDEX0,r
+  INTEGER                                          INFO,m,INDEX0,r,N_
   DOUBLE PRECISION, DIMENSION(:),   ALLOCATABLE :: ENERGY,E_FLOQUET
   COMPLEX*16,       DIMENSION(:,:), ALLOCATABLE :: H__,U_F,U_AUX,U_B2D
   DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: P_AVG
   DOUBLE PRECISION                              :: T1,T2
 
+!  OPEN(UNIT=3,FILE="qubit_oscillation_.dat",ACTION="WRITE")
+!  OPEN(UNIT=4,FILE="qubit_avgtransition_.dat",ACTION="WRITE")
 
-
-
-  OPEN(UNIT=3,FILE="qubit_oscillation_.dat",ACTION="WRITE")
-  OPEN(UNIT=4,FILE="qubit_avgtransition_.dat",ACTION="WRITE")
-
-
-
+  N_ = 128
   INFO = 0
-  CALL FLOQUETINIT('qubit','U',0.2D1,ID,INFO)  
+  
+  CALL FLOQUETINIT(ID,'qubit',info)  
 
   D_BARE = ID%D_BARE
   ALLOCATE(P_AVG(D_BARE,D_BARE))
@@ -63,12 +58,12 @@ PROGRAM MULTIMODEFLOQUET
   FIELDS(2)%phi_y = 0.0
   FIELDS(2)%phi_z = 0.0
   FIELDS(2)%omega = 1.0
-  FIELDS(2)%N_Floquet = 200
+  FIELDS(2)%N_Floquet = 20
 
-  DO m=1,128
+  DO m=1,N_
 
      ! --- SET DRIVING PARAMETERS 
-     FIELDS(2)%omega = 0.2 + (m-1)*2.0/128
+     FIELDS(2)%omega = 0.2 + (m-1)*2.0/N_
      CALL SETHAMILTONIANCOMPONENTS(ID,size(modes_num,1),total_frequencies,MODES_NUM,FIELDS,INFO)
      
      !--- FIND THE MULTIMODE FLOQUET SPECTRUM 
@@ -83,17 +78,17 @@ PROGRAM MULTIMODEFLOQUET
      !--- EVALUATE THE AVERAGE TRANSITION PROBATILIBIES IN THE BARE BASIS
      P_AVG = 0.0
      CALL MULTIMODETRANSITIONAVG(SIZE(U_F,1),size(MODES_NUM,1),FIELDS,MODES_NUM,U_F,E_FLOQUET,ID%D_BARE,P_AVG,INFO)   
-     WRITE(4,*) FIELDS(2)%omega,P_AVG
+     WRITE(*,*) FIELDS(2)%omega,P_AVG
          
      !--- EVALUATE TIME-EVOLUTION OPERATOR IN THE BARE BASIS
      T1 = 0.0
-     DO r=1,128
-        T2 = r*32.0*4.0*atan(1.0)/128
+     DO r=1,N_
+        T2 = r*32.0*4.0*atan(1.0)/N_
         CALL MULTIMODETIMEEVOLUTINOPERATOR(SIZE(U_F,1),SIZE(MODES_NUM,1),MODES_NUM,U_F,E_FLOQUET,ID%D_BARE,FIELDS,T1,T2,U_AUX,INFO) 
         P_AVG = ABS(U_AUX)**2
-        WRITE(3,*) t2,FIELDS(2)%OMEGA,ABS(U_AUX)**2
+        !WRITE(*,*) t2,FIELDS(2)%OMEGA,ABS(U_AUX)**2
      END DO
-     WRITE(3,*)
+     !WRITE(*,*)
      DEALLOCATE(E_FLOQUET)
      DEALLOCATE(U_F)
   END DO

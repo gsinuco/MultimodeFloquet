@@ -101,7 +101,7 @@ SUBROUTINE QUICK_SORT_INTEGERS(v,index_t,N)
   INTEGER, DIMENSION(N),INTENT(INOUT) :: v
   INTEGER, DIMENSION(N),INTENT(INOUT) :: index_t
 
-  INTEGER, PARAMETER :: NN=2500, NSTACK=500
+  INTEGER, PARAMETER :: NN=10000, NSTACK=8000
   real :: a, cpu
   integer :: trial
   INTEGER :: k,i,j,jstack,l,r,istack(NSTACK),indice

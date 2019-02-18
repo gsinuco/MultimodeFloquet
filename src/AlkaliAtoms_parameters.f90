@@ -2,6 +2,7 @@
 MODULE ATOMIC_PROPERTIES
   USE physical_constants
   IMPLICIT NONE
+  ! Parameters values by default
   DOUBLE PRECISION :: L = 0.0
   DOUBLE PRECISION :: S = 0.5
   DOUBLE PRECISION :: J,F,gf,mf  
@@ -113,7 +114,7 @@ MODULE ATOMIC_PROPERTIES
   INTEGER,          PARAMETER :: Fdown_qubit   =  0.5
   CHARACTER(LEN=7) :: ID_name_qubit = "qubit"
 
-    !spin
+  !spin
   DOUBLE PRECISION :: I_spin   =  0.0
   DOUBLE PRECISION :: J_spin   =  0.0  
   DOUBLE PRECISION :: gJ_spin  =  1.0

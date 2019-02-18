@@ -6,7 +6,8 @@ SUBROUTINE MULTIMODEFLOQUETMATRIX_SP(ATOM__,NM,NF,MODES_NUM,FIELDS,VALUES_,ROW_I
   !MODES_NUM  (IN)    : vector indicating the number of harmonics of each driving field (mode)
   !FIELDS     (IN)    : Fields
   !VALUES_    (OUT)   : Hamiltonian values
-  !ROW_INDEX_ (OUT)   : vector indicating the row position of values
+  !ROW_INDEX_ (OUT)   : if INFO = 6 vector indicating the row position of values
+  !ROW_INDEX_ (OUT)   : IF INFO = 0 vector indicating the row_index position of values, as in the three array variation of the csr format
   !COLUMN_    (OUT)   : vector indicating the column position of the values
   !INFO       (INOUT) : error flag. INFO=0 means there is no error
 
@@ -82,7 +83,7 @@ SUBROUTINE MULTIMODEFLOQUETMATRIX_SP(ATOM__,NM,NF,MODES_NUM,FIELDS,VALUES_,ROW_I
   !    !DEALLOCATE(ATOM_%E_BARE)
   ! END IF
 
-  IF(INFO.EQ.0) THEN
+  IF(INFO.GE.0) THEN
      ! COORDINATE PACKING OF EACH FIELD
 
      DO m=1,NF
@@ -94,10 +95,10 @@ SUBROUTINE MULTIMODEFLOQUETMATRIX_SP(ATOM__,NM,NF,MODES_NUM,FIELDS,VALUES_,ROW_I
 !        write(*,*) m,fields(m)%omega, index
         ALLOCATE(FIELDS(m)%ROW(index))
         FIELDS(m)%ROW = ROW(1:index)
- !       WRITE(*,*) FIELDS(m)%ROW
+!        WRITE(*,*)m, FIELDS(m)%ROW
         ALLOCATE(FIELDS(m)%COLUMN(index))
         FIELDS(m)%COLUMN = COLUMN(1:index)
- !       WRITE(*,*) FIELDS(m)%COLUMN
+!        WRITE(*,*)m, FIELDS(m)%COLUMN
      END DO
 
      ! WE HAVE TO REDEFINE VALUES,ROW,COLUMN FOR m > 2 BECAUSE IN THE MULTIMODE FLOQUET
@@ -125,9 +126,9 @@ SUBROUTINE MULTIMODEFLOQUETMATRIX_SP(ATOM__,NM,NF,MODES_NUM,FIELDS,VALUES_,ROW_I
            VALUES = FIELDS(FIELD_INDEX)%VALUES
            ROW    = FIELDS(FIELD_INDEX)%ROW
            COLUMN = FIELDS(FIELD_INDEX)%COLUMN
+!           write(*,*) size(column,1)
            !WRITE(*,*) m,r,row,real(values),D!SIZE(FIELDS(FIELD_INDEX)%VALUES,1)
            DO c=2,D ! it starts in 2, because 1 is explicitly done in the previous three lines
-              !write(*,*) c,row
               CALL APPENDARRAYS(VALUES,FIELDS(FIELD_INDEX)%VALUES,INFO)
               ARRAYI_AUX = FIELDS(FIELD_INDEX)%ROW + (c-1)*D_BARE
               CALL APPENDARRAYSI(ROW,ARRAYI_AUX,INFO)
@@ -136,7 +137,8 @@ SUBROUTINE MULTIMODEFLOQUETMATRIX_SP(ATOM__,NM,NF,MODES_NUM,FIELDS,VALUES_,ROW_I
               !WRITE(*,*) m,r,c,D,2*N_FLOQUET(m-1)+1,SIZE(VALUES,1)
               !           write(*,*) c,real(values)
               !           write(*,*) row
-              !           write(*,*) column
+              !write(*,*) "C:",c,column
+              !write(*,*)
            END DO
            !        WRITE(*,*) m,r, SIZE(VALUES,1),field_index
            !        write(*,*) REAL(VALUES)
@@ -174,7 +176,7 @@ SUBROUTINE MULTIMODEFLOQUETMATRIX_SP(ATOM__,NM,NF,MODES_NUM,FIELDS,VALUES_,ROW_I
      ALLOCATE(VALUES(SIZE(FIELDS(1)%VALUES)))
      ALLOCATE(ROW(SIZE(FIELDS(1)%VALUES)))
      ALLOCATE(COLUMN(SIZE(FIELDS(1)%VALUES)))
-
+     
      VALUES     = FIELDS(1)%VALUES
      ROW        = FIELDS(1)%ROW
      COLUMN     = FIELDS(1)%COLUMN
@@ -202,8 +204,6 @@ SUBROUTINE MULTIMODEFLOQUETMATRIX_SP(ATOM__,NM,NF,MODES_NUM,FIELDS,VALUES_,ROW_I
         END DO
         !     WRITE(*,*) REAL(VALUES)
         !     WRITE(*,*) ROW
-        !     WRITE(*,*) COLUMN
-
         DO c=1,MODES_NUM(m) !NOW WE POPULATE AS MANY UPPER AND LOWER OFF-DIAGONAL MATRICES AS HARMONICS. 
            DO r = 1,2*N_FLOQUET(m) + 1 - c           
               CALL APPENDARRAYS(VALUES,FIELDS(FIELD_INDEX)%VALUES,INFO)           
@@ -224,7 +224,6 @@ SUBROUTINE MULTIMODEFLOQUETMATRIX_SP(ATOM__,NM,NF,MODES_NUM,FIELDS,VALUES_,ROW_I
         END DO
         !     WRITE(*,*) REAL(VALUES)
         !     WRITE(*,*) ROW
-        !     WRITE(*,*) COLUMN
 
         D = D*(2*N_FLOQUET(m)+1)
         DEALLOCATE(VALUES_OLD_)
@@ -245,7 +244,11 @@ SUBROUTINE MULTIMODEFLOQUETMATRIX_SP(ATOM__,NM,NF,MODES_NUM,FIELDS,VALUES_,ROW_I
      DEALLOCATE(ROW_OLD)
      DEALLOCATE(COLUMN_OLD)
 
-
+     IF(info.eq.6) THEN
+        VALUES_    = VALUES
+        ROW_INDEX_ = ROW
+        COLUMN_    = COLUMN
+     ELSE
 
 
 
@@ -256,70 +259,76 @@ SUBROUTINE MULTIMODEFLOQUETMATRIX_SP(ATOM__,NM,NF,MODES_NUM,FIELDS,VALUES_,ROW_I
      !  END DO
      !    WRITE(*,*) SIZE(VALUES,1)
      !    WRITE(*,*) REAL(VALUES)
-     !    WRITE(*,*) ROW
-     !    WRITE(*,*) COLUMN
-     !WRITE(*,*) 
-     ALLOCATE(INDEX_ORDERROW(SIZE(ROW,1)))
-     CALL QUICK_SORT_INTEGERS(ROW,INDEX_ORDERROW,SIZE(ROW,1))
-     ROW    = ROW(INDEX_ORDERROW)
-     COLUMN = COLUMN(INDEX_ORDERROW)
-     VALUES = VALUES(INDEX_ORDERROW)
+!     WRITE(*,*) ROW
+     !WRITE(*,*) COLUMN
+!     WRITE(*,*) 
 
-     !write(*,*) row
-     !WRITE(*,*)
-     !write(*,*) column
-     !WRITE(*,*)
-     !WRITE(*,*) VALUES
-     !WRITE(*,*) D_MULTIFLOQUET
-
-
-     ALLOCATE(ROW_INDEX(D_MULTIFLOQUET+1))
-     !ALLOCATE(ROW_INDEX(SIZE(VALUES,1)+1))
-     ROW_INDEX = -1
-     ROW_INDEX(D_MULTIFLOQUET+1) = SIZE(VALUES,1)+1
-     !ROW_INDEX(SIZE(VALUES,1)+1) = SIZE(VALUES,1)+1
-
-     counter = 1
-
-     D = 1
-     ROW_INDEX(1)=1
-     DO r = 2,SIZE(ROW,1)
-        IF(ROW(r).EQ.ROW(r-1)) THEN
-           counter = counter +1        
-        ELSE
-           D = D + counter
-           ROW_INDEX(ROW(r)) =D
-           counter = 1
-        END IF
-     END DO
-
-     !  WRITE(*,*) D_MULTIFLOQUET,nf
-     !E_L = -60.0
-     !E_R =  60.0
-     !ALLOCATE(E_FLOQUET(D_MULTIFLOQUET))
-     !ALLOCATE(U_F(D_MULTIFLOQUET,D_MULTIFLOQUET))
-     !CALL MKLSPARSE_FULLEIGENVALUES(D_MULTIFLOQUET,SIZE(VALUES,1),VALUES,ROW_INDEX,COLUMN,E_L,E_R,E_FLOQUET,U_F,INFO)
-     !write(*,*) E_FLOQUET
-
-     ALLOCATE(VALUES_(SIZE(VALUES,1)))
-     ALLOCATE(ROW_INDEX_(SIZE(ROW_INDEX,1)))
-     ALLOCATE(COLUMN_(SIZE(COLUMN,1)))
-
-     VALUES_    = VALUES
-     ROW_INDEX_ = ROW_INDEX
-     COLUMN_    = COLUMN
-
-     DO m=1,NF
-        DEALLOCATE(FIELDS(m)%VALUES)
-        DEALLOCATE(FIELDS(m)%ROW)
-        DEALLOCATE(FIELDS(m)%COLUMN)
-     END DO
-
-
-     DEALLOCATE(VALUES)
-     DEALLOCATE(ROW)
-     DEALLOCATE(COLUMN)
-     DEALLOCATE(ROW_INDEX)
+        ALLOCATE(INDEX_ORDERROW(SIZE(ROW,1)))
+        CALL QUICK_SORT_INTEGERS(ROW,INDEX_ORDERROW,SIZE(ROW,1))
+        ROW    = ROW(INDEX_ORDERROW)
+        COLUMN = COLUMN(INDEX_ORDERROW)
+        VALUES = VALUES(INDEX_ORDERROW)
+        
+        !     write(*,*) index_orderrow
+        !     write(*,*)
+        !     write(*,*) row
+        !WRITE(*,*)
+        !WRITE(*,*)
+        !     WRITE(*,*) size(values,1), size(column,1), size(row,1)
+        !     WRITE(*,*) D_MULTIFLOQUET
+        
+        
+        ALLOCATE(ROW_INDEX(D_MULTIFLOQUET+1))
+        !ALLOCATE(ROW_INDEX(SIZE(VALUES,1)+1))
+        ROW_INDEX = -1
+        ROW_INDEX(D_MULTIFLOQUET+1) = SIZE(VALUES,1)+1
+        !ROW_INDEX(SIZE(VALUES,1)+1) = SIZE(VALUES,1)+1
+        
+        counter = 1
+        
+        D = 1
+        ROW_INDEX(1)=1
+        DO r = 2,SIZE(ROW,1)
+           IF(ROW(r).EQ.ROW(r-1)) THEN
+              counter = counter +1    
+              !           write(*,*) r,row(r), counter,D
+           ELSE
+              D = D + counter
+              ROW_INDEX(ROW(r)) =D
+              !if(row(r).eq.2) write(*,*)"m3",r,ROW_INDEX(ROW(r)),row(r),D
+              counter = 1
+           END IF
+        END DO
+        !     write(*,*) row_index(1:10)
+        !  WRITE(*,*) D_MULTIFLOQUET,nf
+        !E_L = -60.0
+        !E_R =  60.0
+        !ALLOCATE(E_FLOQUET(D_MULTIFLOQUET))
+        !ALLOCATE(U_F(D_MULTIFLOQUET,D_MULTIFLOQUET))
+        !CALL MKLSPARSE_FULLEIGENVALUES(D_MULTIFLOQUET,SIZE(VALUES,1),VALUES,ROW_INDEX,COLUMN,E_L,E_R,E_FLOQUET,U_F,INFO)
+        !write(*,*) E_FLOQUET
+        
+        ALLOCATE(VALUES_(SIZE(VALUES,1)))
+        ALLOCATE(ROW_INDEX_(SIZE(ROW_INDEX,1)))
+        ALLOCATE(COLUMN_(SIZE(COLUMN,1)))
+        
+        VALUES_    = VALUES
+        ROW_INDEX_ = ROW_INDEX
+        COLUMN_    = COLUMN
+        
+        DO m=1,NF
+           DEALLOCATE(FIELDS(m)%VALUES)
+           DEALLOCATE(FIELDS(m)%ROW)
+           DEALLOCATE(FIELDS(m)%COLUMN)
+        END DO
+        
+        
+        DEALLOCATE(VALUES)
+        DEALLOCATE(ROW)
+        DEALLOCATE(COLUMN)
+        DEALLOCATE(ROW_INDEX)
+     END IF
   END IF
+     !  write(*,*) column_(3080:3200)
 END SUBROUTINE MULTIMODEFLOQUETMATRIX_SP ! _SP  sparse packing
 

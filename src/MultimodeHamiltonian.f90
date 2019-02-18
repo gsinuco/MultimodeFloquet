@@ -28,8 +28,8 @@ SUBROUTINE MULTIMODEFLOQUETMATRIX(ATOM_,NM,NF,MODES_NUM,FIELD,INFO)
 
   INTEGER, DIMENSION(NM) :: N_FLOQUET
 
-  write(*,*) "# Creating the multimode hamiltonian for a", ID_name
-  write(*,*) "# with ", NM," modes and ", NF, "frequencies"
+!  write(*,*) "# Creating the multimode hamiltonian for a", ID_name
+!  write(*,*) "# with ", NM," modes and ", NF, "frequencies"
   
   INFO      = 0
   N_FLOQUET = 0
@@ -44,7 +44,7 @@ SUBROUTINE MULTIMODEFLOQUETMATRIX(ATOM_,NM,NF,MODES_NUM,FIELD,INFO)
         INFO = -10
      END IF
   END DO
-  write(*,*) "# Floquet modes:", N_FLOQUET
+!  write(*,*) "# Floquet modes:", N_FLOQUET
 
   IF(INFO.EQ.0) THEN
      D_OLD    = 1
@@ -60,7 +60,7 @@ SUBROUTINE MULTIMODEFLOQUETMATRIX(ATOM_,NM,NF,MODES_NUM,FIELD,INFO)
 
 
         ! D : UPDATED AT THE ENDO OF THE LOOP. DIMENSION OF THE MULTIMODE FLOQUET MATRIX
-
+        ALLOCATE(H_STATIC(SIZE(H_FLOQUET_COPY,1),SIZE(H_FLOQUET_COPY,1)))
         H_STATIC  = H_FLOQUET_COPY  
         DEALLOCATE(H_FLOQUET_COPY)
 
@@ -172,10 +172,11 @@ SUBROUTINE MULTIMODEFLOQUETMATRIX(ATOM_,NM,NF,MODES_NUM,FIELD,INFO)
            ALLOCATE(H_FLOQUET_COPY(D,D))
            H_FLOQUET_COPY = H_FLOQUET
            DEALLOCATE(H_FLOQUET)
+           DEALLOCATE(H_STATIC)
         END IF
 
      END DO
-     write(*,*) "# Dimension of the matrix:", size(H_FLOQUET,1)
+!     write(*,*) "# Dimension of the matrix:", size(H_FLOQUET,1)
 
 !     CALL WRITE_MATRIX(real(H_FLOQUET))
   ELSE

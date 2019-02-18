@@ -34,11 +34,13 @@ PROGRAM MULTIMODEFLOQUET
 
 
  
-  OPEN(UNIT=3,file="Rb87_bareoscillation_DRIVER.dat", action="write")
-  OPEN(UNIT=4,file="Rb87_dressedoscillation_DRIVER.dat", action="write")
+!  OPEN(UNIT=3,file="Rb87_bareoscillation_DRIVER.dat", action="write")
+!  OPEN(UNIT=4,file="Rb87_dressedoscillation_DRIVER.dat", action="write")
 
 
   INFO = 0
+  CALL FLOQUETINIT('87Rb','U',2,ID,INFO)
+ 
   CALL FLOQUETINIT('87Rb','B',2,ID,INFO)
   ALLOCATE(ENERGY(SIZE(J_Z,1)))
   ALLOCATE(H__(SIZE(J_z,1),SIZE(J_z,1)))

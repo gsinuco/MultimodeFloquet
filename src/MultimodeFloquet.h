@@ -12,12 +12,25 @@ struct atom_c{
   int d_bare;
 };
 
+/*
+void floquetinit_c_(atom_c * id_c , int *lenght_name, char *atomicspecie,int * info){
+  floquetinit_c__(id_c,atomicspecie,info);
+}
+void floquetinit_c_(atom_c * id_c , int *lenght_name, char *atomicspecie,char * manifold,int * info){
 
+}
+void floquetinit_c_(atom_c * id_c , int *lenght_name, char *atomicspecie,double * jtotal, int * info){
+
+}
+*/
 extern "C" {
   // GENERAL INIT SUBROUTINE
-  void floquetinit_c_(int *length_name, char *atomicspecie,char  *manifold,int * jtotal,atom_c * id_c,int * info);
-
-  
+  //void floquetinit_c_(int *length_name, char *atomicspecie,char  *manifold,int * jtotal,atom_c * id_c,int * info);
+  //void floquetinit_c_(atom_c *id_c, int *length_name, char *atomicspecie,int * info); 
+  void floquetinit_qubit_c_(atom_c *id, int *lenght_name, char * atomicspecie, int * info);
+  void floquetinit_spin_c_(atom_c *id, int *lenght_name, char * atomicspecie, double * jtotal, int * info);
+  void floquetinit_alkali_c_(atom_c *id, int *lenght_name, char * atomicspecie, int * lenght_name2, char * manifold, int * info);
+       
   // SET HAMILTONIAN OF SPIN-LIKE MODELS
   void  sethamiltoniancomponents_c_(atom_c *id,int * nm, int * total_frequencies,int * modes_num,mode_c * fields,int * info);
   
@@ -30,6 +43,7 @@ extern "C" {
   // CALCULATE THE SPECTRUM OF THE FLOQUET HAMILTONIAN
   void   lapack_fulleigenvalues_c_(dcmplx * u_f,int * h_floquet_size,double * e_floquet,int *info);
   void mklsparse_fulleigenvalues_c_(int * h_floquet_size,double * e_l,double * e_r,double * e_floquet,dcmplx *U_F, int * info);
+
   void matmul_c_(int *op_lenght, char * op, dcmplx * a, int * ra, int * ca, dcmplx * b, int * rb, int * cb, dcmplx * c,int * info);
   
   
@@ -47,8 +61,6 @@ extern "C" {
   void  dressedbasis_sp_c_(int h_floquet_size, atom_c *id, int * nm, int * modes_num, mode_c * fields, dcmplx * U_FD, double * e_dressed, int * info);
   void micromotionfourierdressedbasis_c_(atom_c *id , int * dressingfields_indices, int * modes_num,mode_c * fields,int * info);
   void micromotiondressedbasis_c_(atom_c *id , int * modes_num, int * dressingfields_indices, mode_c * fields, double T1, dcmplx * U, int * info);
-  //  SUBROUTINE MICROMOTIONFOURIERDRESSEDBASIS_C(ID,DRESSINGFIELDS_INDICES,MODES_NUM,FIELDS, U_FD,E_DRESSED,INFO)
-  ///     SUBROUTINE MICROMOTIONDRESSEDBASIS_C(ID,MODES_NUM,DRESSINGFIELDS_INDICES,FIELDS,U_F_MODES,E_MULTIFLOQUET,T1,U,INFO) 
 
   
   // UTILITY FUNCTION: EXTRACT GLOBAL VARIABLES WITH SCOPE ONLY WITHIN FORTRAN
@@ -72,7 +84,34 @@ void floquetinit_c(char *name,char *manifold,int *jtotal,atom_c *id,int *info){
   int length_name;
   
   length_name = strlen(name);
-  floquetinit_c_(&length_name,name,manifold,jtotal,id,info);
+  //  floquetinit_c_(&length_name,name,manifold,jtotal,id,info);
+
+}
+void floquetinit_c(atom_c * id, char *name,int *info){
+  
+  int length_name;
+  
+  length_name = strlen(name);
+  //  printf("")
+  floquetinit_qubit_c_(id,&length_name,name,info);
+
+}
+void floquetinit_c(atom_c * id,char *name,char *manifold,int *info){
+  
+  int length_name,length_name2;
+  
+  length_name = strlen(name);
+  length_name2 = strlen(manifold);
+  floquetinit_alkali_c_(id,&length_name,name,&length_name2,manifold,info);
+
+}
+ 
+void floquetinit_c(atom_c *id, char *name, double  *jtotal,int *info){
+  
+  int length_name;
+  
+  length_name = strlen(name);
+  floquetinit_spin_c_(id,&length_name,name,jtotal,info);
 
 }
 

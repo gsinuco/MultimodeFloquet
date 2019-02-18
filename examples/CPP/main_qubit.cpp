@@ -28,7 +28,8 @@ int main(){
 
   info   = 0;
   jtotal = 2;
-  floquetinit_c(name,manifold,&jtotal,&id,&info);
+  t1     = 2.0;
+  floquetinit_c(&id,name,&info);
 
   d_bare = id.d_bare;
 

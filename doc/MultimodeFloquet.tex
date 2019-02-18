@@ -1,7 +1,7 @@
-\documentclass[12pt,a4paper]{article}
-\usepackage[a4paper,bindingoffset=0.2in,%
-            left=1in,right=1in,top=1in,bottom=1in,%
-            footskip=.25in]{geometry}
+\documentclass[10pt,a4paper]{article}
+\usepackage[a4paper,bindingoffset=0.3in,%
+            left=0.7in,right=0.7in,top=0.7in,bottom=0.7in,%
+            footskip=.125in]{geometry}
 \usepackage{multirow}
 \usepackage{blindtext}
 \usepackage[dvips]{graphics}
@@ -14,36 +14,64 @@
 \usepackage{array}
 
 
-\addtolength{\topmargin}{1.3cm}
-\addtolength{\textheight}{-0.4cm}
-\setlength{\hoffset}{0.5cm}
+%\addtolength{\topmargin}{1.3cm}
+%\addtolength{\textheight}{-0.4cm}
+%\setlength{\hoffset}{0.5cm}
+
 \bibliographystyle{unsrt}
 
 \newcommand{\text}[1]{\textrm{\tiny{#1}}}
 
-\title{The TEOQuS library: open source software for multimode driven quantum systems \\ User manual}
-\author{G. A. Sinuco-Le\'on  \\ \small{\textit{Department of Physics and Astronomy, University of Sussex,Brighton, BN1 9QH, UK}}} 
+\title{The openMMF library: open source software for multimode driven quantum systems \\ User manual}
+%\author{G. A. Sinuco-Le\'on  \\ \small{\textit{Department of Physics and Astronomy, University of Sussex,Brighton, BN1 9QH, UK}}} 
 \date{\today.}
 
 \begin{document}
 \maketitle
 
+%\section{Introduction}
+
+\section{How to build the library and compile the examples}
+
+The openMMF source code includes a \verb Makefile file for compiling and building the library. The user must ensure that the  system's path to the Lapack and (optionally) the MKL-intel libraries can be found by the \verb Makefile script.  
+
+When the paths are set correctly, compiling the library requires invoking a single \verb make command with the following options:
+
+\begin{itemize}
+\item \verb make  \verb lib :  compiles the library including support for sparse matrices. This option requires the Lapack and MKL-intel libraries.
+\item \verb make  \verb lib_lapack : compiles the library without support for sparse matrices. This option requires Lapack.
+\item \verb make  \verb all_examples : complies all examples under the folders \verb examples/CPP and  \verb examples/FORTRAN .
+\item \verb make  : run the options \verb lib  and \verb all_examples .
+\end{itemize} 
+All options of the \verb make  command produces the static library \verb libopenmmf saving it in the folder \verb ~/lib . A number of \verb .mod files product of the building process are moved to the folder \verb ~/include  and required for running applications.
+
+To compile the Fortran examples that only require the support of the Lapack library must be compiled using the command:
+\begin{verbatim}
+gfortran -o out SourceCode.f90 -I$(INCLUDE_OPENMMF) -L$(LIB_OPENMMF) -lopenmmf $(GFFLAGS)
+\end{verbatim}
+while code that requires support from the MKL library is compiled by:
+\begin{verbatim}
+gfortran -o out SourceCode.f90 -I$(INCLUDE_OPENMMF) -L$(LIB_OPENMMF) -lopenmmf 
+                               -L$(MKLLIBS) -I$(MKLINC) $(GFFLAGS_SP) $(MKLFLAGS)
+\end{verbatim}
+The variables \verb MKLLIBS , \verb MKLINC , \verb GFFLAGS , \verb GFFLAGS_SP and \verb MKLFLAGS are defined in the file \verb Makefile . The environmental variables  \verb INCLUDE_OPENMMF  and  \verb LIB_OPENMMF  indicate the paths to the  include and library folders of the openMMF library. Compilation of \verb C++  source code follows the same formula, using the additional flag \verb -lgfortran  and the corresponding compiler \verb g++ . For an explicit example of usage in this case see the building script under \verb examples/CPP/Makefile .
+
+When running  applications that use the MKL-intel library, the environmental variable \verb LD_LIBRARY_PATH  must indicate the path to such a library, which can be done with the shell command:
+\begin{verbatim}
+export LD_LIBRARY_PATH="/opt/intel/compilers_and_libraries_2017/linux/mkl/lib/intel64  
+\end{verbatim}
+which assumes that the library is installed in the default folder corresponding to the MKL version installed in the system. 
 
 
-\section{Software description}
-
-
-In section we provide the header of each one of the subroutines of the library, including the argument declaration to help the user to identify the type of variable expected by each function.
-
-\section{Multimode expansion of the time-dependent Schrodinger equation}
+\section{What does the library calculate and how? }
 The library can be used to calculate the time-evolution operator, $U(t',t), ~ t'>t$, of systems whose Hamiltonian has the form:
 \begin{equation}
 H = \sum_{i,j}^D E_{i,j} \left| i\right\rangle \left\langle j \right| + \sum_{i,j}^D \sum_{\ell=1}^N \sum_{n \in Z} V_{i,j}^{\ell,n} e^{i n \omega_\ell t} \left| i\right\rangle \left\langle j \right| + \textrm{h.c.}
 \label{eq:Hamiltonian}
 \end{equation}
-where $D$ is the dimension of the Hilbert space, ${E_{i,j}}$ defines a static component of $H$, $V_{i,j}^{\ell,n}$ is the coupling between the states $i$ and $j$ oscillating at frequency $n \omega_{\ell}$ (i.e. the $n$-th harmonic of the $\ell$-th fundamental frequency $\omega_{\ell}$) and $N$ is the number of incommensurately frequencies.
+where $D$ is the dimension of the Hilbert space, ${E_{i,j}}$ defines a static component of $H$, $V_{i,j}^{\ell,n}$ is the coupling between the states $i$ and $j$ oscillating at frequency $n \omega_{\ell}$ (i.e. the $n$-th harmonic of the $\ell$-th fundamental frequency $\omega_{\ell}$) and $N$ is the number of incommensurate frequencies.
 
-To calculate the time-evolution operator we generalise the Rotating (or Resonant) Wave Approximation (RWA), taking into account the complex time dependence of eq. (\ref{eq:Hamiltonian}). For this, we rephrase the problem in terms of building a time-dependent unitary transformation, $U_F(t)$ to a new basis $\{\left| \bar{i} \right\rangle\}$, that leads to a \textit{time-independent} and diagonal Hamiltonian, $\bar{H}$. After applying the standard quantum-mechanical transformation rule to the Schr\"odinger equation \cite{chu1985recent,PhysRevA.81.063626}, this condition becomes:
+To calculate the time-evolution operator we generalise the Rotating (or Resonant) Wave Approximation (RWA), taking into account the complex time dependence of eq. (\ref{eq:Hamiltonian}). For this, we rephrase the problem in terms of building a time-dependent unitary transformation, $U_F(t)$ to a new basis $\{\left| \bar{i} \right\rangle\}$, that leads to a \textit{time-independent} and diagonal Hamiltonian, $\bar{H}$. The operator $U_F(t)$ is called the \textit{micromotion operator} and the new basis is a generalised definition of the \textit{dressed basis}. After applying the standard quantum-mechanical transformation rule to the Schr\"odinger equation \cite{chu1985recent,PhysRevA.81.063626}, this condition becomes:
 \begin{eqnarray}
  U_F^\dagger(t) \left[ H(t) - i \hbar \partial_t \right] U_F(t)  &=& \sum_{\bar{i}} \bar{E}_{\bar{i}} \left| \bar{i} \right\rangle \left\langle \bar{i} \right|
 \label{eq:Hdressed}
@@ -67,138 +95,292 @@ U_F(t) = \sum_{\vec{n}} U_{i,\bar{i}}^{\vec{n}} e^{-i\vec{\omega} \cdot \vec{n}t
 \end{equation}
 where $\vec{\omega} = (\omega_1,\omega_2,\ldots,\omega_N)$ and $\vec{n}$ is a $N$-dimensional vector of integers. After plugging this expansion in eq. (\ref{eq:Hdressed}) and performing an integral over time, we obtain a fully defined eigenproblem for the eigenvalues $\bar{E}_{\bar{i}}$ and Fourier components of the unitary transformation $U_{i,\bar{E}}^{\vec{n}}$:
 \begin{equation}
-\sum_{\ell,m} \sum_{i,i'}\sum_{\vec{n}}V^{\ell,m}_{i,i'} U_{i,\bar{i}}^{\vec{n}_m *} U_{i',\bar{i}'}^{\vec{n}_m} - \hbar \vec{\omega} \cdot \vec{n} \delta_{\bar{i},\bar{i}'} \delta_{\vec{n},\vec{n}'} =\bar{E}_{\bar{j}} \delta_{\bar{i},\bar{i}'}
+\sum_j(E_{i,j} - \hbar \vec{n} \cdot \vec{\omega})U^{\vec{n}}_{j,\bar{i}} + \sum_{j} \sum_{\vec{m}} \left[ V^{\vec{m}}_{i,j} U^{\vec{n}+\vec{m}}_{j,\bar{i}} + V^{\vec{m}*}_{ji} U^{\vec{m}-\vec{n}}_{j,\bar{i}}\right] = \bar{E}_{\bar{i}}U^{\vec{n}}_{i,\bar{i}}
 \label{eq:multimodeeigenproblem}
 \end{equation}
-where $\vec{n}_{\ell,m} = \vec{n} + m P_{\ell}$ with $P_{\ell} = (0,\ldots, 1, \ldots,0)$ the projector at the $\ell-$th position. To obtain a finite matrix representation of this problem we truncate the sum over the number of modes of the Fourier expansion eq. (\ref{eq:micromotionexpansion}). Below, in Appendix A, we show an specific example of the shape of the matrix.
+where $\vec{n}_{\ell,m} = \vec{n} + m P_{\ell}$ with $P_{\ell} = (0,\ldots, 1, \ldots,0)$ the projector at the $\ell-$th position. To obtain a finite matrix representation of this problem we truncate the sum over the number of modes of the Fourier expansion eq. (\ref{eq:micromotionexpansion}). 
 
 This formulation to calculate the time-evolution operator is equivalent to the multimode Floquet representation of the Hamiltonian that introduces an extended Hilbert space $\left| E_i,\vec{n} \right\rangle$  \cite{ho1983semiclassical,verdeny2016quasi}. However, the semiclassical description presented here makes emphasis in the physically accessible states. 
 
 
-\section{Usage}
+\section{Use of the library}
 
-As a concrete example, here we illustrate the use of the library functionality considering a two . The fortran and C++ source codes are provided with the library  \verb examples/FORTRAN/main_DressedQubit.f90 \verb examples/CPP/main_dressedqubit.cpp, respectively. 
+Here we illustrate the use of the library's functionality considering a quibit driven by two harmonic forces.  The Hamiltonian of this system has the form:
+
+\begin{equation}
+H = \hbar \omega_0 S_z + \hbar \Omega_1 \cos(\omega_1 t) S_x + \hbar \Omega_{2,x} \cos(\omega_2 t) S_x + \hbar \Omega_{2,y} \cos(\omega_2 t)  S_z
+\label{eq:dressedqubitmodel}
+\end{equation}
+The Fortran and C++ source codes to find the time-evolution operator are in the files:
+\begin{itemize}
+\item  \verb examples/FORTRAN/main_DressedQubit.f90  .
+\item  \verb examples/CPP/main_dressedqubit.cpp  .
+\end{itemize}
 
 \subsection{Setting the stage}
-The intial instruction needed to use the library must declare the two derived types:
+First of all, we should declare the two derived types:
 \begin{verbatim}
   TYPE(ATOM)                                       ID
   TYPE(MODE),       DIMENSION(:),   ALLOCATABLE :: FIELDS
 \end{verbatim}
 
-\verb ID will store information about the type of system, such as the number of levels and their energy. The derived type \verb FIELDS will contain information required build the components of the hamiltonian as well as the explicit matrix representation of couplings.
+\noindent 
+The variable \verb ID  contains information about the type of system, such as the number of levels and their energy spectrum (see the declaration of \verb TYPE(ATOM)  in Section \ref{sec:derivedtypes}).  The derived type \verb FIELDS  stores information required build the components of the Hamiltonian as well as the explicit matrix representation of the couplings.
 
-The parameters of \verb ID are initialised by calling the subroutine:
+In this concrete example, the components of \verb ID  are initialised by calling the subroutine:
 \begin{verbatim}
-  CALL FLOQUETINIT('qubit',ID,INFO)
+  CALL FLOQUETINIT(ID,'qubit',INFO)
 \end{verbatim}
-The first argument indicates the type of system (here 'qubit'), which, in this case, it is sufficient to initialize the variable \verb ID . In this case, we obtain \verb ID%D_BARE=2 and th  
+The second argument indicates the type of system (here 'qubit'), which, is sufficient to initialise the variable  \verb ID :
+\begin{verbatim}
+ ID%id_system = 1 
+ ID%D_BARE    = 2 
+\end{verbatim}
+where \verb ID%D_BARE  indicates the dimension of the Hilbert space.
 
-An explanation of other options of this function is explained in section.
+Additional options of the function \verb FLOQUETINIT  are presented in section \ref{sec:InitOptions}, which are useful for initialising some frequently used physical systems with default parameters. When dealing with a general quantum system (i.e. with an arbitrary energy spectrum), there is no need to call this function and the values of a variable of \verb TYPE(ATOM) must be initialised explicitly.
+
+In the source code, the next relevant instruction is the definition of an integer vector that provides information about the number of driving frequencies. The integer array \verb MODES_NUM  is allocated with size 3, indicating that the system will be driven by two fundamental frequencies (corresponding to $\ell = 1,2$ in eq. \ref{eq:Hamiltonian}), since the first component is reserved to the static part of the Hamiltonian. The values of the elements of this array indicate the number of driving harmonics of each frequency, which here we set to $1$ (making $n=1$ in eq. \ref{eq:Hamiltonian}). 
+
+The total number of driving frequencies is equal to the sum of all elements of the array \verb MODES_NUM  . The user then should allocate sufficient memory space to store each one of the matrix representation of the couplings $V^{\ell,n}$. This is done with the sequence of instructions:
 
 \begin{verbatim}
-ID%id_system  = 4 
-ID%D_BARE =  Number of energy states
-ALLOCATE(ID%E_BARE(n)) : an array to store the energies
+  TOTAL_FREQUENCIES = SUM(MODES_NUM,1)
+  ALLOCATE(FIELDS(TOTAL_FREQUENCIES))
+  DO m=1,TOTAL_FREQUENCIES
+     ALLOCATE(FIELDS(m)%V(ID%D_BARE,ID%D_BARE))
+  END DO
 \end{verbatim}
 
-system init
-For a number of systems the library includes this  the subroutine FLOQUETINIT(atomicspecie,manifold,JTOTAL,ID,info)
+By default the first element of the array of \verb FIELDS  is reserved for the static component of the Hamiltonian, which includes the spectrum of the static system as diagonal elements of the matrix \verb FILEDS(1)%V .  The next step then consist in defining all components of the Hamiltonian. For an quantum system with arbitrary energy spectrum, each one of the matrices \verb FIELDS(m)%V must be declared explicitly. 
 
-  ! ATOMICSPECIE: 87Rb,6Li,Cs,41K,qubit,lattice, SPIN
-  ! MANIFOLD : "U" UPPER HYPERFINE MANIFOLD, "L" LOWER HYPERFIND MANIFOLD, "B" BOTH
-  ! JTOTAL   :  IF ATOMICSPECIE .EQ. SPIN THEN JTOTAL IS THE TOTAL ANGULAR MOMENTUM OF THE SPIN
-  !             IF ATOMICSPECIE .EQ. LATTICE, THEN JTOTAL IS THE NUMBER OF SITES
+When dealing with spin systems, as in the present example, each component of the Hamiltonian can be written as:
+\begin{equation}
+V^{\ell,n} = e^{\phi_x} X S_x + e^{\phi_y} Y S_y + e^{\phi_z} Z S_z
+\label{eq:Vspinparametrisation}
+\end{equation}
+where $S_i$ is the angular momentum operator. Therefore, we need only six parameters (three phases and three amplitudes) to define the coupling matrices. 
 
-For an arbitrary system, it is not necesary to call this function and the matrix componets can be inditialized directly
-
-the number of driving fields in the vector 
-
-This sequence of instructino indicates that the qubit is driven by two fundamental frequencies. The first frequency has a a single harmonic (modes(2) = 1) while the second frequency has the fundamental and the first harmonic (\verb modes_num(3)=2 ).
-
-The driving fields are then initialize in the derived tye FIELDS. For the system of interes the Hamiltonian componet can be by scalar parameteers and they are defined explicitily. The frequency and the number of the expansio are defined by , respectively. Notice that the dimension of the \verb total_frequencies=3  corresponding to the static plus two driving frequencies.
-
+These six parameters should be declared explicitly for each one of the the driving modes, along with the frequency (\verb omega ) and the corresponding number of modes to be included in the Fourier expansion of the evolution operator (\verb N_Floquet ). The values of these parameters are initialised as follows:
+\begin{verbatim}
+  FIELDS(1)%X         = 0.0
+  FIELDS(1)%Y         = 0.0
+  FIELDS(1)%Z         = 1.0
+  FIELDS(1)%phi_x     = 0.0
+  FIELDS(1)%phi_y     = 0.0
+  FIELDS(1)%phi_z     = 0.0
+  FIELDS(1)%omega     = 0.0
+  FIELDS(1)%N_Floquet = 0
+\end{verbatim}
+where the correspondence with eq. (\ref{eq:Vspinparametrisation}) is obvious. This set of instructions is repeated for each one of the driving fields, as can be seen in the source code.
 
 \subsection{Hamiltonian components}
 
+The instructions detailed before let us to build the matrix representation of the terms in eq. \ref{eq:Vspinparametrisation}. This is done simply by calling the subroutine:
 
-The user should allocated space of each matrix component of the Hamiltonian. If the system is one of the defaults, them the Hamiltonian componet have defined forms which are initialized, after defieinnin scalar parameters correwsondin tothe couplings the . In the particular case, this is done as follows
+\begin{verbatim}
+CALL  SETHAMILTONIANCOMPONENTS(ID,size(modes_num,1),total_frequencies,MODES_NUM,FIELDS,INFO)
+\end{verbatim}
+which results in storing the coupling $V^{\ell,n}$ in the set of matrices \verb FIELDS(r)%V , with \verb r=1,total_frequencies .
 
-\verb CALL \verb SETHAMILTONIANCOMPONENTS(ID,size(modes_num,1),total_frequencies,MODES_NUM,FIELDS,INFO)  .
-
-defines each one of the contributiosn to the Hamtilton and stores them in the matrix \verb fields()%V .
-
-By default, the first one is assumed as the static component of the Hamiltonian.
-
-a spares representation of the hamiltnia cmponets is build in the and stored in the arrays, whose name is selfexplanatory. This representation is needed to build the 
-
-For an arbitray system, each matrix should be defined element by element (see e.g  random matrix example)
+We remind the user that when the system of interest is not one of the default types defined in section \ref{sec:InitOption}, the user must define explicitly and in full all the coupling matrices. For an example of this situation, see  the source file  \verb example/FORTRAN/main_lattice.f90 .
 
 \subsection{Multimode Floquet matrix and diagonalisation}
 
-Once the coonents of the hamiltonian are defined (ie.e the complete set of matrices \verb FIELDS(mode)%V ), the Multimode Hamiltonian cna be initialized callin the funciton. 
+Once the components of the Hamiltonian are defined (i.e the complete set of matrices \verb FIELDS(r)%V  has been initialise), the multimode Hamiltonian can be calcuated calling the function:
 
 \begin{verbatim}
   CALL MULTIMODEFLOQUETMATRIX(ID,size(modes_num,1),total_frequencies,MODES_NUM,FIELDS,INFO)          
 \end{verbatim}
 
-As a result of this call, the system stores the full multimode Floquet matrix in \verb H_FLOQUET, whose size is calcuated internally. A sparse representation of this matrix is obtained using teh call..... 
+As a result of this call, the system stores the full multimode Floquet matrix on the left-hand side of eq. (\ref{eq:multimodeeigenproblem}) in the matrix \verb H_FLOQUET. This matrix is defined in the module \verb ARRAYS and  can be accessed (and modified!) by all computational routines that include this module. The size of this matrix is calculated internally and stored in the parameter \verb h_floquet_size , which is also a global variable. 
+
+The library includes a subroutine to evaluate a sparse representation of this matrix, which results after invoking:
 \begin{verbatim}
-  CALL MULTIMODEFLOQUETMATRIX_SP(ID,size(modes_num,1),total_frequencies,MODES_NUM,FIELDS,INFO)          
+  CALL MULTIMODEFLOQUETMATRIX_SP(ID,SIZE(MODES_NUM,1),total_frequencies,
+                                 MODES_NUM,FIELDS,VALUES,ROW_INDEX,COLUMN,INFO)
 \end{verbatim}
-which produces three vectors .....
 
-The library includes wrappers to diagonalisation subroutines of the lapack of the MKL-intel library (for the sparse representation). These function are called using:
+Setting INFO = 0, this instruction produces the representation of the Floquet matrix \verb H_FLOQUET in the three array variation of the Compressed Sparse Row (CSR) storage format. With INFO=6, we get the matrix stored as three arrays of equal length, corresponding to values, rows and columns positions. The non-zero values of the matrix are stored in the complex array \verb VALUES, and the information about their location is encoded in the integer arrays \verb COLUMN  and \verb ROW_INDEX . The size of these three arrays are evaluated internally.
 
-lapack   
-\verb CALL \verb LAPACK_FULLEIGENVALUES(H_FLOQUET,SIZE(H_FLOQUET,1),E_FLOQUET,INFO) .
+The library includes wrappers to diagonalisation subroutines from the Lapack and the MKL-intel (for the sparse CSR representation) libraries. These functions are called using:
 
-MKL
+\noindent
+Lapack :  
+\begin{verbatim}
+ CALL  LAPACK_FULLEIGENVALUES(U_F,SIZE(H_FLOQUET,1),E_FLOQUET,INFO)
+\end{verbatim}
 
+\noindent
+MKL:
+\begin{verbatim}
+ CALL MKLSPARSE_FULLEIGENVALUES(D_MULTIFLOQUET,SIZE(VALUES,1),VALUES,ROW_INDEX,
+                                                     COLUMN,E_L,E_R,E_FLOQUET,U_F,INFO)
+\end{verbatim}
 
-In all cases the eigenvalues are stores in .. and the eigen fuciton in ... These eigenvectors are the multimode Foureire decomposition of the tiem evluion operator ....
+In both cases, the eigenvalues are stored in the array \verb E_FLOQUET  and the eigenvectors are stored as columns of the matrix \verb U_F. Remember that these eigenvectors correspond to the coefficients of the multimode Fourier decomposition of the micromotion operator eq. (\ref{eq:micromotionexpansion}). Invoking the MKL subroutine requires two additional parameter \verb E_L and \verb E_R : the lower and upper bounds of the interval to be searched for eigenvalues, respectively. The user is responsible to set meaningful values of both parameters. 
+
+\noindent
+\textit{Warning!}
+
+The variation of the CSR representation of the matrix is produced by sorting the array of ROW position, in such a way that all non-zero values of a given row become stored consequtively. This sorting is done using a \verb QUICK_SORT algorithm of the Numerical Reciepes book. Tor this to work properly for the present application,  the user must make sure that the internal arrays of the sorting function are big enough depending on the number of non-zero values. If the user notes that MKL eigenvalue calculator fails for matrices larger than certain dimension (but it works for smaller ones), it is possible that the  internal arrays of \verb QUICK_SORT algorithmmust be of bigger size. This can be fixed modifying the values of \verb NN and \verb NSTACK  of the function \verb QUICK_SORT_INTEGERS  located in the file \verb src/quick-sort-index-table.f90 . Alternatively, the user can produce the \verb value, \verb column, \verb \row  storage of the extended Hamiltonian matrix calling the function \verb MULTIMODEFLOQUETMATRIX_SP having defined \verb INFO=6 , and use other sparse eigenproblem solver.
 
 \subsection{Time-evolution operator}
 
-The time evoluiton is evlauted using the, betwteen t1 and t2  callin the funciton....
-\verb CALL \verb MULTIMODETIMEEVOLUTINOPERATOR(SIZE(U_F,1),SIZE(MODES_NUM,1),MODES_NUM,U_F,E_FLOQUET,ID%D_BARE,FIELDS,T1,T2,U_AUX,INFO)  .
+With the full spectrum of \verb H_FLOQUET , the time evolution operator  between \verb T1 and \verb T2, corresponding to eq. (\ref{eq:baretimeevolution}), can be evaluated calling the function:
+\begin{verbatim}
+CALL MULTIMODETIMEEVOLUTINOPERATOR(SIZE(U_F,1),SIZE(MODES_NUM,1),MODES_NUM,U_F,E_FLOQUET,
+                                                          ID%D_BARE,FIELDS,T1,T2,U_AUX,INFO)
+\end{verbatim}
+
+The time evolution operator is stored in the complex matrix \verb U_AUX , whose size is equal to the number of bare states \verb ID%D_BARE .
 
 \subsection{Micromotion operator}
 
-The micromotion operator is the instantatnous transofrmation. Assuming we know the foure decomposiontino, then the intant tante ou evaluated using .... This is done using the subroutine 
+The micromotion operator is the time-dependent unitary transformation between the bare basis and the basis of state where the Hamiltonian is time-independent. Since we know the Fourier decomposition of this transformation via the diagonalisation of \verb H_FLOQUET , we can evaluate the instantaneous transformation, e.g. at time \verb T1, using the subroutine: 
 
-\verb CALL \verb MULTIMODEMICROMOTION(ID,SIZE(U_F,1),NM,MODES_NUM,U_F,E_FLOQUET,ID%D_BARE,FIELDS_,T1,U_F1_red,INFO)  .
- 
+\begin{verbatim}
+ CALL MULTIMODEMICROMOTION(ID,SIZE(U_F,1),NM,MODES_NUM,U_F,E_FLOQUET,ID%D_BARE,
+                                                               FIELDS_,T1,U_F1,INFO)
+\end{verbatim} 
+
+The micromotion operator is stored in the square matrix \verb U_F1 , of size \verb ID%D_BARE .
 
 \subsection{Identifying the dressing modes}
 
-In several application is useful to define a dressed.. for this, the user can identify a subset of driving field, e.g. The library uses the if withn the set of \verb modes_num identify a subset of , e.g. .... 
-
-lines .. allocate needed memory space, and the 
-
-\verb CALL \verb MICROMOTIONFOURIERDRESSEDBASIS(ID,DRESSINGFIELDS_INDICES,MODES_NUM,FIELDS,U_FD,E_DRESSED,INFO) .
+In several application is useful to define a dressed basis of states. The library includes functions to simplify the evaluation of the evolution operator in the basis of dressed states. For this, first the user should identify the subset of driving fields that define the dressed states. This is done using a integer array with as a many components as dressing fields. The elements of this array indicate the indices of the fields corresponding to the array \verb modes_num . For example, if there is only one dressing field corresponding to the second component of the array \verb MODES_NUM, then the array \verb DRESSINFIELDS_INDICES must be:
 
 \begin{verbatim}
-CALL MICROMOTIONDRESSEDBASIS(ID,MODES_NUM,DRESSINGFIELDS_INDICES,FIELDS,U_FD,&
- & E_DRESSED,T1,U_F1_red,INFO) 
+INTEGER, DIMENSION(2) :: DRESSINGFIELDS_INDICES
+DRESSINGFIELDS_INDICES(1) = 1 ! THE STATIC COMPONEN
+DRESSINGFIELDS_INDICES(2) = 2 ! THE FIRST DRIVING FIELD
+\end{verbatim} 
+
+With this, the Fourier decomposition of the micromotion operator defining the dressed basis can be obtained simply by calling the function:
+
+\begin{verbatim}
+ CALL MICROMOTIONFOURIERDRESSEDBASIS(ID,DRESSINGFIELDS_INDICES,MODES_NUM,
+                                                     FIELDS,U_FD,E_DRESSED,INFO)
 \end{verbatim}
-then the  (micromotion operator) is defined calling the function....
 
-and the micromotion operator at tiem t is evaluated with the function. Then, the time evolution operator in the dressed basis can be writen as:
+The Fourier components are stored in the matrix \verb U_FD and the spectrum of dressed energies are stored in the array \verb E_DRESSED .  With these two elements, we can calculate the micromotion operator of the dressed basis using the subroutine:
+
+\begin{verbatim}
+CALL MICROMOTIONDRESSEDBASIS(ID,MODES_NUM,DRESSINGFIELDS_INDICES,FIELDS,U_FD,
+                                                            E_DRESSED,T1,U_FD_1,INFO) 
+\end{verbatim}
+
+The micromotion operator at T1 is then stored as the square matrix \verb U_FD_1 . This set of instructions let us to evaluate the time-evolution operator in the dressed basis using the sequence:
+
+\begin{verbatim}
+   CALL MICROMOTIONDRESSEDBASIS(ID,MODES_NUM,DRESSINGFIELDS_INDICES,FIELDS,U_FD,
+                                                             E_DRESSED,T1,U_F1,INFO) 
+   CALL MICROMOTIONDRESSEDBASIS(ID,MODES_NUM,DRESSINGFIELDS_INDICES,FIELDS,U_FD,
+                                                             E_DRESSED,T2,U_F2,INFO) 
+        
+   ! ---- CALCULATE THE TIME-EVOLUTION OPERATOR IN THE DRESSED 
+   ! ---- BASIS USING THE PREVIOUSLY CALCULATED IN THE BARE BASIS
+
+   U_AUX = MATMUL(TRANSPOSE(CONJG(U_F2)),MATMUL(U_AUX,U_F1)) 
+
+\end{verbatim}
 
 
-\subsection{driven routine}
+\section{Default system types}
+\label{sec:InitOptions}
 
-The time evolution perato can be calculated calling the funcition.. ..
+The openMMF library defines three different system types by default. These are:
 
+\subsection{Qubit}
+This type represents a two level system, where the couplings with oscillating field are of the form
+\begin{equation}
+V^{\ell,n} = X S_x e^{\phi_{\ell,x}} +  Y S_y e^{\phi_{\ell,y}} + Y S_z e^{\phi_{\ell,z}}
+\end{equation}
+with $S_i, i\in{x,y,z}$ the set of spin $1/2$ angular momentum operators with $\hbar := 1$.
+
+The corresponding derived type is initialised with the instruction: 
+\begin{verbatim}
+ FLOQUET_INIT(ID,'qubit',INFO)
+\end{verbatim}
+
+\subsection{Spin of total angular momentum $S_z$}
+This type represents a system with $2 S_z + 1$ equally space energy levels, where the couplings with oscillating fields are of the form:
+\begin{equation}
+V^{\ell,n} = X S_x e^{\phi_{\ell,x}} +  Y S_y e^{\phi_{\ell,y}} + Y S_z e^{\phi_{\ell,z}}
+\end{equation}
+with $S_i, i\in{x,y,z}$ the set of  angular momentum operators with total spin $S_z$.
+
+The corresponding derived type is initialised with the instruction:
+\begin{verbatim}
+ \verb FLOQUET_INIT(ID,'spin',2*Sz,INFO) 
+\end{verbatim}
+where the third argument is a \verb DOUBLE \verb PRECISION  variable equal to the double of the projection of the total angular momentum.
+
+\subsection{Ground state Alkali atoms.}
+The effective model of an alkali atom consist of an electron with zero orbital angular momenta interacting with a static nucleus. These two particles interact via their magnetic moments, which define two manifolds of states corresponding to the total angular momenta $F=I\pm1/2$. The library can be used to study inter and intra manifold dynamics.
+
+\noindent
+For example, to study the dynamics with focus on the manifold with total angular momentum $F=I-1/2$ ('L', for lower), the corresponding \verb ID can be obtained by invoking: 
+\begin{verbatim}
+CALL FLOQUET_INIT(ID,SPECIE_NAME,'L',INFO) 
+\end{verbatim}
+
+and the Hamiltonian components are built assuming the form:
+\begin{equation}
+V^{\ell,n} = \frac{\mu_B g_{I-1/2} B_x}{A} F_x e^{\phi_{\ell,x}} +  \frac{\mu_B g_{I-1/2} B_y}{A} F_y e^{\phi_{\ell,y}} + \frac{\mu_B g_{I-1/2} B_z}{A} F_z e^{\phi_{\ell,z}}
+\end{equation}
+
+Similarly, to study the dynamic of the manifold with $F=I+1/2$ ('U', for upper), the system is initialised using:
+\begin{verbatim}
+ CALL  \verb FLOQUET_INIT(ID,SPECIE_NAME,'U',INFO) 
+\end{verbatim}
+which assumes couplings of the form
+\begin{equation}
+V^{\ell,n} = \frac{\mu_B g_{I+1/2} B_x}{A} F_x e^{\phi_{\ell,x}} +  \frac{\mu_B g_{I+1/2} B_y}{A} F_y e^{\phi_{\ell,y}} + \frac{\mu_B g_{I+1/2} B_z}{A} F_z e^{\phi_{\ell,z}}
+\end{equation}
+where
+\begin{equation}
+g_{I\pm1/2} = 
+\end{equation}
+
+Finally, when both manifolds are of interest, we should use:
+\begin{verbatim}
+CALL \verb FLOQUET_INIT(ID,SPECIE_NAME,'B',INFO) 
+\end{verbatim}
+which prepares the system to initialise couplings of the form:
+\begin{equation}
+V^{\ell,n} = \frac{\mu_B  B_x}{A} (g_J J_x + g_I I_x) e^{\phi_{\ell,x}} +  \frac{\mu_B B_y}{A} (g_J J_y + g_I I_y) e^{\phi_{\ell,y}} + \frac{\mu_B B_z}{A} (g_J J_z + g_I I_z) e^{\phi_{\ell,z}}
+\end{equation}
+
+In all these cases, after invoking the initialisation routine \verb FLOQUET_INIT  and defining the parameters of the couplings using the derived data type \verb TYPE(MODES)::FIELDS, the matrix representation of each component of the Hamiltonian can be obtained with a single call to the subroutine:
+\begin{verbatim}
+CALL SETHAMILTONIANCOMPONENTS(ID,size(modes_num,1),total_frequencies,MODES_NUM,FIELDS,INFO) 
+\end{verbatim}
+where \verb total_frequencies is the total number of driving fields (including a static component). For a complete example see the source code at \verb examples/FORTRAN/main_87Rb.f90 .
+
+
+\section{C++ wrappers}
+
+The library includes  C++ interfaces for each one of the subroutines defined. These interfaces are declared in files with the same name as the ones containing the Fortran declarations, but with the particle \verb _C appended before the ending extension \verb .f90 . Similarly,  wrapper subroutine are named using the corresponding Fortran names and appending the particle \verb _c at the end of the name. For example, the file \verb MultimodeFloquetTE_C.f90  is paired with the file \verb MultimodeFloquet.f90 and defines the subroutine \verb MULTIMODETIMEEVOLUTIONOPERATOR_C , which is used in \verb c++ using \verb multimodetimeevolutionoperator_c_  followed by the declared list of arguments (see example at \verb examples/CPP/main_qubit.cpp .
+
+The prototype of all function enabled for C++ are declared in the header file \verb include/MultimodeFloquet.h . This scheme let us to establish a line-by-line  correspondence between the Fortran and C++ source codes.
+
+\section{Bugs and known limitations}
+
+If you find any bug please contact the developing team using the github hosting link https://github.com/gsinuco/MultimodeFloquet/releases
+
+\section{Acknowledgements}
+
+This work has been supported by the EPSRC grants EP/I010394/1 and EP/M013294/1.
 
 \section{MODULES}
 
-The library include several 
+In section we provide the header of each one of the subroutines of the library, including the argument declaration, to help the user to identify the type of variable expected by each function.
 
 \subsection{Physical Constants}
 
-The module \verb physical_constants defines the default values of commonly used parameters defining the Hamiltonian of atomic systems. The values are based on the .... . The user can in src/ 
+The module \verb physical_constants defines the default values of commonly used parameters defining the Hamiltonian of atomic systems. The user can modify these values accessing the file in \verb src/Modules.f90 .
+
 \begin{verbatim}
 MODULE physical_constants
   IMPLICIT NONE
@@ -222,30 +404,28 @@ END MODULE physical_constants
 
 \subsection{Arrays}
 
-The module \verb ARRAYS provides global definitions of matrices. The user cannot define variables using any of the names in this.
+The module \verb ARRAYS provides global definitions of matrices. When using the module, the user cannot define variables using any of the names declared in this module. 
 
 \begin{verbatim}
 MODULE ARRAYS
-
-  DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: Identity,CLEBSH_GORDAN_JtoF,j_x,j_y,j_z,I_x,I_y,I_z 
-  COMPLEX*16,       DIMENSION(:,:), ALLOCATABLE :: H_hyperfine,HAMILTONIAN,H_RF,H_FLOQUET,H_IJ,Z_M,H_OLD,U_ZEEMAN,Z_M_SUBSET
-  COMPLEX*16,       DIMENSION(:,:), ALLOCATABLE :: H_RF_DAGGER,H_ALPHA_DAGGER,H_ALPHA,H_FLOQUET_COPY,H_MW
-  COMPLEX*16,       DIMENSION(:,:), ALLOCATABLE :: observable, observable_extended, MW_coupling_dressedbasis
-  DOUBLE PRECISION, DIMENSION(:),   ALLOCATABLE :: W_SPACE,W_SPACEF,W_SPACEF_0,E_OLD
-  DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: Fx,Fy,Fz,g_F_matrix
-  COMPLEX*16,       DIMENSION(:,:), ALLOCATABLE :: Hamiltonian_F,Identity_F,H_AUX,U_RF
-  COMPLEX*16,       DIMENSION(:,:), ALLOCATABLE :: H_FLOQUET_INTERACTION,H_FLOQUET_INTERACTION_DAGGER,H_FLOQUET_2D,H_FLOQUETBAND
-  INTEGER,          DIMENSION(:,:), ALLOCATABLE :: F_t,H_w,H_J,H_M,Jz_dash,Fz_dash
-  INTEGER,          DIMENSION(:),   ALLOCATABLE :: index_state
-  INTEGER                                       :: KD
-  DOUBLE PRECISION, DIMENSION(3)                :: POSITION,DELTA_POSITION
-
+  DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: Identity,j_x,j_y,j_z,I_x,I_y,I_z 
+  COMPLEX*16,       DIMENSION(:,:), ALLOCATABLE :: H_IJ,HAMILTONIAN
+  COMPLEX*16,       DIMENSION(:,:), ALLOCATABLE :: H_FLOQUET,H_FLOQUET_COPY
+  COMPLEX*16,       DIMENSION(:,:), ALLOCATABLE :: U_ZEEMAN
 END MODULE ARRAYS
 \end{verbatim}
 
+\noindent
+To deallocate these arrays, the user can invoke the call:
+\noindent
+\begin{verbatim}
+CALL DEALLOCATEALL(ID)
+\end{verbatim}
+where the variable \verb TYPE(ATOM)  \verb ID  defines the type of problem.
+
 \subsection{Atomic properties}
 
-The \verb ATOMIC_PROPERTIES module defines the default physical parameters of 
+The \verb ATOMIC_PROPERTIES  module defines the default physical parameters of 
 
 \begin{verbatim}
 MODULE ATOMIC_PROPERTIES
@@ -335,7 +515,7 @@ END MODULE FEAST
 \end{verbatim}
 
 \section{DERIVED TYPES (src/modes.f90)}
-
+\label{sec:derivedtypes}
 The derived type defined 
 \begin{verbatim}
 MODULE TYPES
@@ -361,22 +541,11 @@ MODULE TYPES
      INTEGER,   DIMENSION(:),   ALLOCATABLE :: n
   END type HARMONIC_FACTORS
 
-  TYPE :: MWCOUPLING
-     COMPLEX*16,DIMENSION(:,:),ALLOCATABLE :: TOP
-     COMPLEX*16,DIMENSION(:,:),ALLOCATABLE :: TOP_DAGGER
-     COMPLEX*16,DIMENSION(:,:),ALLOCATABLE :: DC
-     COMPLEX*16,DIMENSION(:,:),ALLOCATABLE :: DC_DAGGER
-     COMPLEX*16,DIMENSION(:,:),ALLOCATABLE :: MW
-     COMPLEX*16,DIMENSION(:,:),ALLOCATABLE :: MW_DAGGER
-     COMPLEX*16,DIMENSION(:,:),ALLOCATABLE :: RF
-     COMPLEX*16,DIMENSION(:,:),ALLOCATABLE :: RF_DAGGER
-  END type MWCOUPLING
 END MODULE TYPES
 \end{verbatim}
 
 \section{COMPUTATIONAL SUBROUTINES}
 
-The \verb ATOMIC_PROPERTIES module defines the default physical parameters of 
 
 \begin{verbatim}
 SUBROUTINE FLOQUETINIT(atomicspecie,manifold,JTOTAL,ID,info)
@@ -412,7 +581,9 @@ SUBROUTINE FLOQUETINIT(atomicspecie,manifold,JTOTAL,ID,info)
 \begin{verbatim}
 SUBROUTINE SETHAMILTONIANCOMPONENTS(ID,NM,NF,MODES_NUM,FIELD,INFO)
   ! ID  tYPE OF ATOM
-  ! MODES_NUM, VECTOR. THE SIZE OF THE VECTOR TELL US THE NUMBER OF FREQUENCIES, AND THE VALUE OF EACH COMPONENT INDICATES THE NUMBER OF HARMONICS OF EACH FREQUENCI
+  ! MODES_NUM, VECTOR. THE SIZE OF THE VECTOR TELL US THE NUMBER OF 
+  !           FREQUENCIES, AND THE VALUE OF EACH COMPONENT INDICATES
+  !           THE NUMBER OF  HARMONICS OF EACH FREQUENCI
   ! FIELDS : IN AND OUTPUT THE MATRICES
   ! INFO
 
@@ -470,12 +641,15 @@ SUBROUTINE I_and_J_representations(j_x,j_y,j_z,I_x,I_y,I_z,L,S,I)
 \end{center}
 \begin{verbatim}
 
-SUBROUTINE MULTIMODETIMEEVOLUTINOPERATOR(D,NM,MODES_NUM,U_F_MODES,E_MULTIFLOQUET,D_BARE,FIELD,T1,T2,U,INFO) 
+SUBROUTINE MULTIMODETIMEEVOLUTINOPERATOR(D,NM,MODES_NUM,U_F_MODES,E_MULTIFLOQUET,
+                                                D_BARE,FIELD,T1,T2,U,INFO) 
 
-  ! TIME EVOLUTION OPERATOR OF A MULTIMODE DRESSED SYSTEM. THE EVOLUTION OPERATOR IS WRITEN IN THE BASIS USED TO EXPRESS THE 
+  ! TIME EVOLUTION OPERATOR OF A MULTIMODE DRESSED SYSTEM. 
+  ! THE EVOLUTION OPERATOR IS WRITEN IN THE BASIS USED TO EXPRESS THE 
   ! MULTIMODE FLOQUET HAMILTONIAN
   ! U : MATRIX OF AMPLITUED OF PROBABILITIES FOR TRANSITIONS BETWEEN T1 TO T2
-!!$  D              (IN)   : DIMENSION OF THE EXTENDED HILBERT SPACE (SIZE OF THE MULTIMODE FLOQUET MATRIX)
+!!$  D              (IN)   : DIMENSION OF THE EXTENDED HILBERT SPACE 
+!!$                          (SIZE OF THE MULTIMODE FLOQUET MATRIX)
 !!$  NM             (IN)   : NUMBER OF MODES            
 !!$  MODES_NUM      (IN)   : VECTOR (NM) INDICATING THE NUMBER OF HARMONICS OF EACH MODE
 !!$  U_F_MODES      (IN)   : TRANSFORMATION, DIMENSOON (D,D) 
@@ -484,7 +658,8 @@ SUBROUTINE MULTIMODETIMEEVOLUTINOPERATOR(D,NM,MODES_NUM,U_F_MODES,E_MULTIFLOQUET
 !!$  FIELD          (IN)   : STRUCTURE DESCRIBING THE COUPLINGS
 !!$  T1             (IN)   : INITIAL TIME
 !!$  T2             (IN)   : FINAL TIME
-!!$  U              (OUT)  : TRANFORMATION BETWEEN THE EXTENDED BARE BASIS AND THE FLOQUET STATES, DIMENSION (D_BARE,D)
+!!$  U              (OUT)  : TRANFORMATION BETWEEN THE EXTENDED BARE BASIS AND 
+!!$                          THE FLOQUET STATES, DIMENSION (D_BARE,D)
 !!$  INFO           (INOUT): (POSSIBLE) ERROR FLAG
 
   USE TYPES
@@ -492,14 +667,14 @@ SUBROUTINE MULTIMODETIMEEVOLUTINOPERATOR(D,NM,MODES_NUM,U_F_MODES,E_MULTIFLOQUET
 
 
   IMPLICIT NONE
-  INTEGER,                                    INTENT(IN)    :: D,D_BARE,NM ! DIMENSION OF THE MULTIMODE FLOQUET SPACE AND THE BARE BASIS
+  INTEGER,                                    INTENT(IN)    :: D,D_BARE,NM 
   INTEGER,                                    INTENT(INOUT) :: INFO
   INTEGER,          DIMENSION(NM),            INTENT(IN)    :: MODES_NUM
-  TYPE(MODE),       DIMENSION(NM),            INTENT(IN)    :: FIELD  ! FIELDS PROPERTIES: FREQUENCY, AMPLITUDES AND PHASES
-  DOUBLE PRECISION,                           INTENT(IN)    :: T1,T2  ! IN SECONDS
-  DOUBLE PRECISION, DIMENSION(D),             INTENT(IN)    :: E_MULTIFLOQUET ! SET OF MULTIMODE FLOQUET ENERGIES, IN Hz, TO AVOID HBAR FACTORS
-  COMPLEX*16,       DIMENSION(D,D),           INTENT(IN)    :: U_F_MODES   ! TRANFORMATION MATRIX BETWEEN DRESSED AND BARE BASIS
-  COMPLEX*16,       DIMENSION(D_BARE,D_BARE), INTENT(OUT)   :: U           ! EVOLUTION OPERATOR U(T2,T1)
+  TYPE(MODE),       DIMENSION(NM),            INTENT(IN)    :: FIELD  
+  DOUBLE PRECISION,                           INTENT(IN)    :: T1,T2  
+  DOUBLE PRECISION, DIMENSION(D),             INTENT(IN)    :: E_MULTIFLOQUET 
+  COMPLEX*16,       DIMENSION(D,D),           INTENT(IN)    :: U_F_MODES   
+  COMPLEX*16,       DIMENSION(D_BARE,D_BARE), INTENT(OUT)   :: U           
 
 \end{verbatim}
 \begin{center}
@@ -567,7 +742,8 @@ SUBROUTINE MULTIMODEFLOQUETMATRIX_SP(ATOM__,NM,NF,MODES_NUM,FIELDS,VALUES_,ROW_I
 \end{center}
 \begin{verbatim}
 
-SUBROUTINE MULTIMODEFLOQUETTRANSFORMATION(D,NM,MODES_NUM,U_F_MODES,E_MULTIFLOQUET,D_BARE,FIELD,T1,U,INFO) 
+SUBROUTINE MULTIMODEFLOQUETTRANSFORMATION(D,NM,MODES_NUM,U_F_MODES,E_MULTIFLOQUET,
+                                                                D_BARE,FIELD,T1,U,INFO) 
 
   ! TIME-DEPENDENT TRANSFORMATION BETWEEN THE EXTENDED BARE BASIS AND THE FLOQUET STATES
   ! U(T1) = sum_ U^n exp(i n omega T1)
@@ -580,20 +756,21 @@ SUBROUTINE MULTIMODEFLOQUETTRANSFORMATION(D,NM,MODES_NUM,U_F_MODES,E_MULTIFLOQUE
 !!$  D_BARE         (IN)   : DIMENSION OF THE BARE HILBERT SPACE
 !!$  FIELD          (IN)   : STRUCTURE DESCRIBING THE COUPLINGS
 !!$  T1             (IN)   : TIME. THE BARE 2 DRESSED TRANSFORMATINO IS TIME DEPENDENT
-!!$  U              (OUT)  : TRANFORMATION BETWEEN THE EXTENDED BARE BASIS AND THE FLOQUET STATES, DIMENSION (D_BARE,D)
+!!$  U              (OUT)  : TRANFORMATION BETWEEN THE EXTENDED BARE BASIS AND THE FLOQUET STATES, 
+!!$                          DIMENSION (D_BARE,D)
 !!$  INFO           (INOUT): (POSSIBLE) ERROR FLAG
  
   USE TYPES
 
   IMPLICIT NONE
-  INTEGER,                                    INTENT(IN)    :: D,D_BARE,NM ! DIMENSION OF THE MULTIMODE FLOQUET SPACE AND THE BARE BASIS
+  INTEGER,                                    INTENT(IN)    :: D,D_BARE,NM 
   INTEGER,                                    INTENT(INOUT) :: INFO
   INTEGER,          DIMENSION(NM),            INTENT(IN)    :: MODES_NUM
-  TYPE(MODE),       DIMENSION(NM),            INTENT(IN)    :: FIELD  ! FIELDS PROPERTIES: FREQUENCY, AMPLITUDES AND PHASES
-  DOUBLE PRECISION,                           INTENT(IN)    :: T1 ! IN SECONDS
-  DOUBLE PRECISION, DIMENSION(D),             INTENT(IN)    :: E_MULTIFLOQUET ! SET OF MULTIMODE FLOQUET ENERGIES, IN Hz, TO AVOID HBAR FACTORS
-  COMPLEX*16,       DIMENSION(D,D),           INTENT(IN)    :: U_F_MODES ! TRANFORMATION MATRIX BETWEEN DRESSED FLOQUET AND BARE EXTENDED BASIS
-  COMPLEX*16,       DIMENSION(D_BARE,D),      INTENT(OUT)   :: U ! TIME-DEPENDENT TRANSFORMATINO BETWEEN THE DRESSED AND EXTENDED BARE BASIS
+  TYPE(MODE),       DIMENSION(NM),            INTENT(IN)    :: FIELD  
+  DOUBLE PRECISION,                           INTENT(IN)    :: T1 
+  DOUBLE PRECISION, DIMENSION(D),             INTENT(IN)    :: E_MULTIFLOQUET 
+  COMPLEX*16,       DIMENSION(D,D),           INTENT(IN)    :: U_F_MODES 
+  COMPLEX*16,       DIMENSION(D_BARE,D),      INTENT(OUT)   :: U 
 
 \end{verbatim}
 \begin{center}
@@ -625,14 +802,14 @@ SUBROUTINE MULTIMODEMICROMOTION(ID,D,NM,MODES_NUM,U_F_MODES,E_MULTIFLOQUET,D_BAR
 
   IMPLICIT NONE
   TYPE(ATOM),                INTENT(IN)    :: ID
-  INTEGER,                                    INTENT(IN)    :: D,D_BARE,NM ! DIMENSION OF THE MULTIMODE FLOQUET SPACE AND THE BARE BASIS
+  INTEGER,                                    INTENT(IN)    :: D,D_BARE,NM 
   INTEGER,                                    INTENT(INOUT) :: INFO
   INTEGER,          DIMENSION(NM),            INTENT(IN)    :: MODES_NUM
-  TYPE(MODE),       DIMENSION(NM),            INTENT(IN)    :: FIELD  ! FIELDS PROPERTIES: FREQUENCY, AMPLITUDES AND PHASES
-  DOUBLE PRECISION,                           INTENT(IN)    :: T1 ! IN SECONDS
-  DOUBLE PRECISION, DIMENSION(D),             INTENT(IN)    :: E_MULTIFLOQUET ! SET OF MULTIMODE FLOQUET ENERGIES, IN Hz, TO AVOID HBAR FACTORS
-  COMPLEX*16,       DIMENSION(D,D),           INTENT(IN)    :: U_F_MODES ! TRANFORMATION MATRIX BETWEEN DRESSED FLOQUET AND BARE EXTENDED BASIS
-  COMPLEX*16,       DIMENSION(D_BARE,D_BARE), INTENT(OUT)   :: U ! TIME-DEPENDENT TRANSFORMATINO BETWEEN THE DRESSED AND EXTENDED BARE BASIS
+  TYPE(MODE),       DIMENSION(NM),            INTENT(IN)    :: FIELD  
+  DOUBLE PRECISION,                           INTENT(IN)    :: T1 
+  DOUBLE PRECISION, DIMENSION(D),             INTENT(IN)    :: E_MULTIFLOQUET 
+  COMPLEX*16,       DIMENSION(D,D),           INTENT(IN)    :: U_F_MODES 
+  COMPLEX*16,       DIMENSION(D_BARE,D_BARE), INTENT(OUT)   :: U 
 
 \end{verbatim}
 \begin{center}
@@ -640,7 +817,8 @@ SUBROUTINE MULTIMODEMICROMOTION(ID,D,NM,MODES_NUM,U_F_MODES,E_MULTIFLOQUET,D_BAR
 \end{center}
 \begin{verbatim}
 
-SUBROUTINE MICROMOTIONFOURIERDRESSEDBASIS(ID,DRESSINGFIELDS_INDICES,MODES_NUM,FIELDS, U_FD,E_DRESSED,INFO)
+SUBROUTINE MICROMOTIONFOURIERDRESSEDBASIS(ID,DRESSINGFIELDS_INDICES,MODES_NUM,FIELDS, 
+                                                                      U_FD,E_DRESSED,INFO)
 ! ID        (in)    :: TYPE(ATOM) system ID
 ! DRESSINGFIELDS_INDICES (in) :: integer array indicating the indices of the dressing modes
 ! MODES_NUM (in)    :: integer array indicating the number of harmonics of all driving modes 
@@ -663,7 +841,8 @@ SUBROUTINE MICROMOTIONFOURIERDRESSEDBASIS(ID,DRESSINGFIELDS_INDICES,MODES_NUM,FI
 \end{center}
 \begin{verbatim}
 
-SUBROUTINE MICROMOTIONDRESSEDBASIS(ID,MODES_NUM,DRESSINGFIELDS_INDICES,FIELDS,U_F_MODES,E_MULTIFLOQUET,T1,U,INFO) 
+SUBROUTINE MICROMOTIONDRESSEDBASIS(ID,MODES_NUM,DRESSINGFIELDS_INDICES,FIELDS,
+                                                       U_F_MODES,E_MULTIFLOQUET,T1,U,INFO) 
 
 ! ID (in)        :: TYPE(ATOM) system ID
 ! MODES_NUM (in) :: integer array indicating the number of harmonics of each driving mode
@@ -694,12 +873,15 @@ SUBROUTINE MICROMOTIONDRESSEDBASIS(ID,MODES_NUM,DRESSINGFIELDS_INDICES,FIELDS,U_
 \end{center}
 \begin{verbatim}
 
-SUBROUTINE MULTIMODETRANSITIONAVG(D,NM,FIELD,MODES_NUM,U_F_MODES,E_MULTIFLOQUET,D_BARE,U,INFO) 
-!!$   AVERAGE TIME EVOLUTION OPERATOR OF A MULTIMODE DRESSED SYSTEM. THE AVERAGE EVOLUTION OPERATOR IS WRITEN IN THE BASIS USED TO EXPRESS THE 
+SUBROUTINE MULTIMODETRANSITIONAVG(D,NM,FIELD,MODES_NUM,U_F_MODES,
+                                              E_MULTIFLOQUET,D_BARE,U,INFO) 
+!!$   AVERAGE TIME EVOLUTION OPERATOR OF A MULTIMODE DRESSED SYSTEM. 
+!!$   THE AVERAGE EVOLUTION OPERATOR IS WRITEN IN THE BASIS USED TO EXPRESS THE 
 !!$   MULTIMODE FLOQUET HAMILTONIAN
 !!$   U : MATRIX OF AVERAGE TRANSITION PROBABILITIES
 !!$
-!!$  D              (IN)   : DIMENSION OF THE EXTENDED HILBERT SPACE (SIZE OF THE MULTIMODE FLOQUET MATRIX)
+!!$  D              (IN)   : DIMENSION OF THE EXTENDED HILBERT SPACE 
+!!$                          (SIZE OF THE MULTIMODE FLOQUET MATRIX)
 !!$  NM             (IN)   : NUMBER OF MODES            
 !!$  MODES_NUM      (IN)   : VECTOR (NM) INDICATING THE NUMBER OF HARMONICS OF EACH MODE
 !!$  U_F_MODES      (IN)   : TRANSFORMATION, DIMENSOON (D,D) 
@@ -714,11 +896,11 @@ SUBROUTINE MULTIMODETRANSITIONAVG(D,NM,FIELD,MODES_NUM,U_F_MODES,E_MULTIFLOQUET,
   TYPE(MODE),DIMENSION(NM), INTENT(IN)     :: FIELD
   INTEGER,   DIMENSION(NM), INTENT(IN)     :: MODES_NUM
 
-  INTEGER,                                    INTENT(IN)    :: D,D_BARE,NM ! DIMENSION OF THE MULTIMODE FLOQUET SPACE AND THE BARE BASIS
+  INTEGER,                                    INTENT(IN)    :: D,D_BARE,NM 
   INTEGER,                                    INTENT(INOUT) :: INFO
-  DOUBLE PRECISION, DIMENSION(D),             INTENT(IN)    :: E_MULTIFLOQUET ! SET OF MULTIMODE FLOQUET ENERGIES, IN Hz, TO AVOID HBAR FACTORS
-  COMPLEX*16,       DIMENSION(D,D),           INTENT(IN)    :: U_F_MODES   ! TRANFORMATION MATRIX BETWEEN DRESSED AND BARE BASIS
-  DOUBLE PRECISION, DIMENSION(D_BARE,D_BARE), INTENT(OUT)   :: U           ! EVOLUTION OPERATOR U(T2,T1)
+  DOUBLE PRECISION, DIMENSION(D),             INTENT(IN)    :: E_MULTIFLOQUET 
+  COMPLEX*16,       DIMENSION(D,D),           INTENT(IN)    :: U_F_MODES   
+  DOUBLE PRECISION, DIMENSION(D_BARE,D_BARE), INTENT(OUT)   :: U           
 
 \end{verbatim}
 \begin{center}
@@ -731,7 +913,8 @@ SUBROUTINE MULTIMODETRANSITIONAVG(D,NM,FIELD,MODES_NUM,U_F_MODES,E_MULTIFLOQUET,
 SUBROUTINE DRESSEDBASIS(D,ID,NM,MODES_NUM,FIELDS,U_FD,E_DRESSED,INFO)
 
 !!$ THIS SUBROUTINES CALCULATES THE FOURIER COMPONENTS OF THE 
-!!$ TRANSFORMATION BETWEEN THE BARE BASIS TO THE DRESSED BASIS DEFINDED BY THE FULL SET OF DRIVING FIELDS.
+!!$ TRANSFORMATION BETWEEN THE BARE BASIS TO THE DRESSED BASIS DEFINDED 
+!!$ BY THE FULL SET OF DRIVING FIELDS.
 !!$
 !!$ D                            : DIMENSION OF THE MULTIMODE EXTENDED HILBERT SPACE
 !!$ ID (IN)                      : TYPE OF QUANTUM SYSTEM
@@ -767,7 +950,8 @@ SUBROUTINE DRESSEDBASIS(D,ID,NM,MODES_NUM,FIELDS,U_FD,E_DRESSED,INFO)
 
 SUBROUTINE DRESSEDBASIS_SP(D,ID,NM,MODES_NUM,FIELDS,U_FD,E_DRESSED,INFO)
 
-!!$THIS SUBROUTINES CALCULATES THE TRANSFORMATION BETWEEN THE BARE BASIS TO THE DRESSED BASIS DEFINDED BY THE FULL SET OF DRIVING FIELDS.
+!!$ THIS SUBROUTINES CALCULATES THE TRANSFORMATION BETWEEN THE BARE 
+!!$ BASIS TO THE DRESSED BASIS DEFINDED BY THE FULL SET OF DRIVING FIELDS.
 !!$ D                            : DIMENSION OF THE MULTIMODE EXTENDED HILBERT SPACE
 !!$ ID (IN)                      : TYPE OF QUATUM SYSTEM
 !!$ NM (IN)                      : NUMBER OF MODES == NUMBER OF DRIVING FIELDS
@@ -801,16 +985,18 @@ SUBROUTINE DRESSEDBASIS_SP(D,ID,NM,MODES_NUM,FIELDS,U_FD,E_DRESSED,INFO)
 
 \begin{verbatim}
 SUBROUTINE TIMEEVOLUTIONOPERATOR(ID,D_BARE,NM,MODES_NUM,FIELD,T1,T2,U,INFO) 
- ! TIME EVOLUTION OPERATOR OF A MULTIMODE DRESSED SYSTEM. THE EVOLUTION OPERATOR IS WRITEN IN THE BASIS USED TO EXPRESS THE 
-  ! MULTIMODE FLOQUET HAMILTONIAN
-  ! U : MATRIX OF AMPLITUED OF PROBABILITIES FOR TRANSITIONS BETWEEN T1 TO T2
+ ! TIME EVOLUTION OPERATOR OF A MULTIMODE DRESSED SYSTEM. THE EVOLUTION 
+ ! OPERATOR IS WRITEN IN THE BASIS USED TO EXPRESS THE 
+ ! MULTIMODE FLOQUET HAMILTONIAN
+ ! U : MATRIX OF AMPLITUED OF PROBABILITIES FOR TRANSITIONS BETWEEN T1 TO T2
 !!$  NM             (IN)   : NUMBER OF MODES            
 !!$  MODES_NUM      (IN)   : VECTOR (NM) INDICATING THE NUMBER OF HARMONICS OF EACH MODE
 !!$  D_BARE         (IN)   : DIMENSION OF THE BARE HILBERT SPACE
 !!$  FIELD          (IN)   : STRUCTURE DESCRIBING THE COUPLINGS
 !!$  T1             (IN)   : INITIAL TIME
 !!$  T2             (IN)   : FINAL TIME
-!!$  U              (OUT)  : TRANFORMATION BETWEEN THE EXTENDED BARE BASIS AND THE FLOQUET STATES, DIMENSION (D_BARE,D)
+!!$  U              (OUT)  : TRANFORMATION BETWEEN THE EXTENDED BARE BASIS AND 
+!!$                          THE FLOQUET STATES, DIMENSION (D_BARE,D)
 !!$  INFO           (INOUT): (POSSIBLE) ERROR FLAG
     
     USE ATOMIC_PROPERTIES
@@ -826,7 +1012,7 @@ SUBROUTINE TIMEEVOLUTIONOPERATOR(ID,D_BARE,NM,MODES_NUM,FIELD,T1,T2,U,INFO)
     INTEGER,                                    INTENT(IN)    :: D_BARE
     INTEGER,                                    INTENT(IN)    :: NM
     INTEGER,          DIMENSION(NM),            INTENT(IN)    :: MODES_NUM
-    TYPE(MODE),       DIMENSION(NM),            INTENT(IN)    :: FIELD  ! FIELDS PROPERTIES: FREQUENCY, AMPLITUDES AND PHASES
+    TYPE(MODE),       DIMENSION(NM),            INTENT(IN)    :: FIELD 
     DOUBLE PRECISION,                           INTENT(IN)    :: T1
     DOUBLE PRECISION,                           INTENT(IN)    :: T2
     COMPLEX*16,       DIMENSION(D_BARE,D_BARE), INTENT(OUT)   :: U
@@ -836,13 +1022,16 @@ SUBROUTINE TIMEEVOLUTIONOPERATOR(ID,D_BARE,NM,MODES_NUM,FIELD,T1,T2,U,INFO)
 \rule{12cm}{1pt}
 \end{center}
 \begin{verbatim}
-SUBROUTINE MICROMOTIONFOURIERDRESSEDBASIS(ID,DRESSINGFIELDS_INDICES,MODES_NUM,FIELDS, U_FD,E_DRESSED,INFO)
-! THIS SUBROUTINE CALCULATES THE FOURIER COMPONENTS (U_FD) AND PHASES (E_DRESSED) OF THE MICROMOTION OPERATOR OF SUBSET OF DRIVING MODES
+SUBROUTINE MICROMOTIONFOURIERDRESSEDBASIS(ID,DRESSINGFIELDS_INDICES,
+                                           MODES_NUM,FIELDS, U_FD,E_DRESSED,INFO)
+! THIS SUBROUTINE CALCULATES THE FOURIER COMPONENTS (U_FD) AND PHASES (E_DRESSED) 
+! OF THE MICROMOTION OPERATOR OF SUBSET OF DRIVING MODES
 ! ID        (in)    :: TYPE(ATOM) system ID
 ! DRESSINGFIELDS_INDICES (in) :: integer array indicating the indices of the dressing modes
 ! MODES_NUM (in)    :: integer array indicating the number of harmonics of all driving modes 
 ! FIELDS    (in)    :: Array of TYPE(MODE) of dimension 
-! U_FD      (out)   :: complex*16 matrix fourier decomposition of the micromotion operator of the dressed basis
+! U_FD      (out)   :: complex*16 matrix fourier decomposition of the micromotion 
+!                      operator of the dressed basis
 ! E_DRESSED (out)   :: dressed energies
 ! INFO      (inout) :: error flag
  
@@ -864,17 +1053,22 @@ END SUBROUTINE MICROMOTIONFOURIERDRESSEDBASIS
 \end{center}
 \begin{verbatim}
 
-SUBROUTINE MICROMOTIONDRESSEDBASIS(ID,MODES_NUM,DRESSINGFIELDS_INDICES,FIELDS,U_F_MODES,E_MULTIFLOQUET,T1,U,INFO) 
-! THIS SUBROUTINE CALCULATES U: THE TIME-DEPENDENT MICROMOTION OPERATOR OF A SUBSET OF THE DRIVING MODES. U_F_MODES AND E_MULTIFLOQUET ARE THE ARRAYS CALCULATED WITH THE SUBROUTINE MICROMOTIONFOURIERDRESSEDBASIS
+SUBROUTINE MICROMOTIONDRESSEDBASIS(ID,MODES_NUM,DRESSINGFIELDS_INDICES,FIELDS,
+                                                 U_F_MODES,E_MULTIFLOQUET,T1,U,INFO) 
+! THIS SUBROUTINE CALCULATES U: THE TIME-DEPENDENT MICROMOTION OPERATOR OF 
+! A SUBSET OF THE DRIVING MODES. U_F_MODES AND E_MULTIFLOQUET ARE THE ARRAYS
+! CALCULATED WITH THE SUBROUTINE MICROMOTIONFOURIERDRESSEDBASIS
 
 ! ID (in)        :: TYPE(ATOM) system ID
 ! MODES_NUM (in) :: integer array indicating the number of harmonics of each driving mode
 ! DRESSINFIELDS_INDICES :: integer array indicating the indices of the dressing modes
 ! FIELDS         :: Array of TYPE(MODES) with NM components (all driving fields)
-! U_F_MODES      :: complex*16 matrix of dimension DxD. Fourier decomposition of the micromotion operator of the dressed basis
+! U_F_MODES      :: complex*16 matrix of dimension DxD. Fourier decomposition of 
+!                   the micromotion operator of the dressed basis
 ! E_MULTIFLOQUET :: dressed energies
 ! T1             :: double precision, time
-! U              :: complex*16 matrix of dimension D_BARE x D_BARE. micromotion operator at time T1
+! U              :: complex*16 matrix of dimension D_BARE x D_BARE. micromotion operator
+!                   at time T1
 ! INFO           :: error flag
 
 
@@ -1034,31 +1228,17 @@ SUBROUTINE MKLSPARSE_FULLEIGENVALUES(D,DV,VALUES,ROW_INDEX,COLUMN,E_L,E_R,E_FLOQ
 
 \begin{verbatim}
 
-SUBROUTINE QUICK_SORT_I_T(v,index_t,N)
+SUBROUTINE QUICK_SORT_INTEGERS(v,index_t,N)
 
   IMPLICIT NONE
   INTEGER, INTENT(IN) :: N
-  
-  !INTEGER, DIMENSION(N),INTENT(INOUT) :: v
-  DOUBLE PRECISION, DIMENSION(N),INTENT(INOUT) :: v
+  INTEGER, DIMENSION(N),INTENT(INOUT) :: v
   INTEGER, DIMENSION(N),INTENT(INOUT) :: index_t
 
-  INTEGER, PARAMETER :: NN=2500, NSTACK=500
+  INTEGER, PARAMETER :: NN=10000, NSTACK=8000
 
 \end{verbatim}
-\begin{center}
-\rule{12cm}{1pt}
-\end{center}
-\begin{verbatim}
 
-SUBROUTINE TESTUNITARITY(N,U,DELTA,INFO)
-  IMPLICIT NONE
-  INTEGER, INTENT(IN) :: N
-  COMPLEX*16, DIMENSION(N,N), INTENT(IN) :: U_F
-  INTEGER, INTENT(INOUT) :: INFO
-  DOUBLE PRECISION, INTENT(OUT) :: DELTA
-
-\end{verbatim}
 \begin{center}
 \rule{12cm}{1pt}
 \end{center}
@@ -1138,8 +1318,6 @@ SUBROUTINE VARCRCPACKING(N,DIM,UPLO,zero,A,VALUES,COLUMNS,ROWINDEX,INFO)
 
 \end{verbatim}
 
-\section{Convention C++ wrappers}
-
-a challenge subroutines with ... and allocatable arrays. This is overcome by denifning global variables ...
+\bibliography{LibraryBib}
 
 \end{document}

@@ -125,7 +125,7 @@ SUBROUTINE LAPACK_FULLEIGENVALUES(H,N,W_SPACE,INFO)
   JOBZ = 'V'
   UPLO = 'L'  
 
-  write(*,*) "# call to lapack diagonalization of a matrix of size",N
+!  write(*,*) "# call to lapack diagonalization of a matrix of size",N
 !  write(*,*) H
 
   ALLOCATE(H_AUX_(N,N))
