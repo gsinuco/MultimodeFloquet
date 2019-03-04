@@ -46,7 +46,8 @@ extern "C" {
   void   lapack_fulleigenvalues_c_(dcmplx * u_f,int * h_floquet_size,double * e_floquet,int *info);
   void mklsparse_fulleigenvalues_c_(int * h_floquet_size,double * e_l,double * e_r,double * e_floquet,dcmplx *U_F, int * info);
 
-  void matmul_c_(int *op_lenght, char * op, dcmplx * a, int * ra, int * ca, dcmplx * b, int * rb, int * cb, dcmplx * c,int * info);
+  //void matmul_c_(int *op_lenght, char * op, dcmplx * a, int * ra, int * ca, dcmplx * b, int * rb, int * cb, dcmplx * c,int * info);
+  void matmul_c_(int * op, dcmplx * a, int * ra, int * ca, dcmplx * b, int * rb, int * cb, dcmplx * c,int * info);
   
   
   // CONTSRUCTION OF THE TIME-EVOLUTION OPERATOR
@@ -125,10 +126,18 @@ void floquetinit_old_c(char *name,char *manifold,int *jtotal,atom_c *id,int *inf
   floquetinit_old_c_(&length_name,name,manifold,jtotal,id,info);
 
 }
-
-void matmul_c(char * op, dcmplx * a, int * ra, int * ca, dcmplx * b, int * rb, int * cb, dcmplx * c,int * info){
+/*
+void matmul_c(const char * op, dcmplx * a, int * ra, int * ca, dcmplx * b, int * rb, int * cb, dcmplx * c,int * info){
   int length_name;
   
   length_name = strlen(op);
   matmul_c_(&length_name,op, a, ra, ca, b, rb, cb, c, info);
+}
+*/
+void matmul_c(int * op , dcmplx * a, int * ra, int * ca, dcmplx * b, int * rb, int * cb, dcmplx * c,int * info){
+  //int length_name;
+  
+  // length_name = strlen(op);
+  printf("%i\n",*op);
+  matmul_c_(op, a, ra, ca, b, rb, cb, c, info);
 }

@@ -211,8 +211,16 @@ int main(){
       }
       
       //! ====== CALCULATE THE TIME-EVOLUTION OPERATOR IN THE DRESSED BASIS USING THE PREVIOUS ONE CALCULATED IN THE BARE BASIS
-      matmul_c("N",U_AUX,&d_bare,&d_bare,U_F1_red,&d_bare,&d_bare,U_AUX,&info);
-      matmul_c("TC",U_F2_red,&d_bare,&d_bare,U_AUX,&d_bare,&d_bare,U_AUX,&info);
+      /*      char mm[]={"N"};      
+      matmul_c(mm,U_AUX,&d_bare,&d_bare,U_F1_red,&d_bare,&d_bare,U_AUX,&info);
+      char mm2[]={"TC"};      
+      matmul_c(mm2,U_F2_red,&d_bare,&d_bare,U_AUX,&d_bare,&d_bare,U_AUX,&info);*/
+
+      i =4;
+      matmul_c(&i,U_AUX,&d_bare,&d_bare,U_F1_red,&d_bare,&d_bare,U_AUX,&info);
+      i = 2;
+      matmul_c(&i,U_F2_red,&d_bare,&d_bare,U_AUX,&d_bare,&d_bare,U_AUX,&info);
+
       for(i=0;i<d_bare*d_bare;i++){
 	P[i] = abs(U_F[i])*abs(U_F[i]);
       }

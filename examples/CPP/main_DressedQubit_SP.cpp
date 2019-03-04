@@ -147,7 +147,7 @@ int main(){
   
   // ! ========= FIND THE MULTIMODE FLOQUET SPECTRUM 
 
-  for(r=0;r<64;r++){
+  for(r=0;r<1;r++){
 
     // ====== SET THE DRESSING FREQUENCY
 
@@ -179,7 +179,7 @@ int main(){
     // ======= EVALUATE TIME-EVOLUTION OPERATOR IN THE BARE BASIS       
     t1 = 0.0;
     t2 = 0.0;
-    for(m=0;m<128;m++){
+    for(m=0;m<1;m++){
       t2 = m*16.0*100/128.0;
       multimodetimeevolutionoperator_c_(&h_floquet_size,&nm,modes_num,U_F,e_floquet,&d_bare,fields,&t1,&t2,U_AUX,&info);	
 
@@ -212,10 +212,12 @@ int main(){
       }
         
       //! ====== CALCULATE THE TIME-EVOLUTION OPERATOR IN THE DRESSED BASIS USING THE PREVIOUS ONE CALCULATED IN THE BARE BASIS
-      matmul_c("N",U_AUX,&d_bare,&d_bare,U_F1_red,&d_bare,&d_bare,U_AUX,&info);
-      matmul_c("TC",U_F2_red,&d_bare,&d_bare,U_AUX,&d_bare,&d_bare,U_AUX,&info);
+      i =4;
+      matmul_c(&i,U_AUX,&d_bare,&d_bare,U_F1_red,&d_bare,&d_bare,U_AUX,&info);
+      i =2;
+      matmul_c(&i,U_F2_red,&d_bare,&d_bare,U_AUX,&d_bare,&d_bare,U_AUX,&info);
       for(i=0;i<d_bare*d_bare;i++){
-	P[i] = abs(U_F[i])*abs(U_F[i]);
+	P[i] = abs(U_AUX[i])*abs(U_AUX[i]);
       }
 
       fprintf(disco1,"%8.3E  %f  %f  %f  %f  %f \n",fields[2].omega,t2,P[0],P[1],P[2],P[3]);
